@@ -1,6 +1,9 @@
 language: go
 go:
   - 1.4
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -qq libgles2-mesa-dev xorg-dev
 install:
   - go get golang.org/x/tools/cmd/vet
 script:
