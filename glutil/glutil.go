@@ -14,7 +14,7 @@ import (
 // CreateProgram creates, compiles, and links a gl.Program.
 func CreateProgram(vertexSrc, fragmentSrc string) (gl.Program, error) {
 	program := gl.CreateProgram()
-	if program.Value == 0 {
+	if !program.Valid() {
 		return gl.Program{}, fmt.Errorf("glutil: no programs available")
 	}
 
@@ -45,7 +45,7 @@ func CreateProgram(vertexSrc, fragmentSrc string) (gl.Program, error) {
 
 func loadShader(shaderType gl.Enum, src string) (gl.Shader, error) {
 	shader := gl.CreateShader(shaderType)
-	if shader.Value == 0 {
+	if !shader.Valid() {
 		return gl.Shader{}, fmt.Errorf("glutil: could not create shader (type %v)", shaderType)
 	}
 	gl.ShaderSource(shader, src)

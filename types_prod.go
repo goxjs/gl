@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // +build linux darwin
+// +build !js
 // +build !gldebug
 
 package gl
@@ -77,6 +78,15 @@ func (v Framebuffer) c() C.GLuint  { return C.GLuint(v.Value) }
 func (v Renderbuffer) c() C.GLuint { return C.GLuint(v.Value) }
 func (v Texture) c() C.GLuint      { return C.GLuint(v.Value) }
 func (v Uniform) c() C.GLint       { return C.GLint(v.Value) }
+
+func (v Attrib) Valid() bool       { return v.Value != 0 }
+func (v Program) Valid() bool      { return v.Value != 0 }
+func (v Shader) Valid() bool       { return v.Value != 0 }
+func (v Buffer) Valid() bool       { return v.Value != 0 }
+func (v Framebuffer) Valid() bool  { return v.Value != 0 }
+func (v Renderbuffer) Valid() bool { return v.Value != 0 }
+func (v Texture) Valid() bool      { return v.Value != 0 }
+func (v Uniform) Valid() bool      { return v.Value != 0 }
 
 func (v Attrib) String() string       { return fmt.Sprintf("Attrib(%d)", v.Value) }
 func (v Program) String() string      { return fmt.Sprintf("Program(%d)", v.Value) }

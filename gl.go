@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // +build linux darwin
+// +build !js
 // +build !gldebug
 
 package gl
@@ -30,6 +31,14 @@ package gl
 import "C"
 
 import "unsafe"
+
+// ContextSwitcher is this library's GL context switcher. It facilitates switching
+// between GL contexts, satisfying ContextSwitcher interface.
+//
+// It is nil on desktop platform since GLFW C library can handle this aspect.
+var ContextSwitcher = (interface {
+	MakeContextCurrent(context interface{})
+})(nil)
 
 // ActiveTexture sets the active texture unit.
 //

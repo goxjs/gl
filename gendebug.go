@@ -222,6 +222,7 @@ const preamble = `// Copyright 2014 The Go Authors.  All rights reserved.
 // See doc.go for details.
 
 // +build linux darwin
+// +build !js
 // +build gldebug
 
 package gl
