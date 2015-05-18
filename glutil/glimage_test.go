@@ -17,8 +17,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/goxjs/gl"
 	"golang.org/x/mobile/geom"
-	"golang.org/x/mobile/gl"
 )
 
 func TestImage(t *testing.T) {
@@ -29,7 +29,7 @@ func TestImage(t *testing.T) {
 	//	4. Copy GL texture back into system memory.
 	//	5. Compare to a pre-computed image.
 
-	f, err := os.Open("../../testdata/testpattern.png")
+	f, err := os.Open("../testdata/testpattern.png")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func TestImage(t *testing.T) {
 	drawCross(got, int(ptBottomRight.X.Px()), int(ptBottomRight.Y.Px()))
 	drawCross(got, pixW-1, pixH-1)
 
-	const wantPath = "../../testdata/testpattern-window.png"
+	const wantPath = "../testdata/testpattern-window.png"
 	f, err = os.Open(wantPath)
 	if err != nil {
 		t.Fatal(err)

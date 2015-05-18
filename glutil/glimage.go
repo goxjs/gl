@@ -12,9 +12,9 @@ import (
 	"image"
 	"sync"
 
+	"github.com/goxjs/gl"
 	"golang.org/x/mobile/f32"
 	"golang.org/x/mobile/geom"
-	"golang.org/x/mobile/gl"
 )
 
 var glimage struct {
