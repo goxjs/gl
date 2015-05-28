@@ -5,8 +5,9 @@
 /*
 Package gl is a Go cross-platform binding for OpenGL, with an OpenGL ES 2-like API.
 
-It currently supports OS X, Linux via OpenGL ES 2 backend, and all modern desktop
-and mobile browsers via WebGL 1 backend. Windows support is upcoming.
+It supports OS X, Linux and Windows via OpenGL/OpenGL ES backends,
+iOS and Android via OpenGL ES backend,
+and modern desktop and mobile browsers via WebGL 1 backend.
 
 This is a fork of golang.org/x/mobile/gl/... packages with [CL 8793](https://go-review.googlesource.com/8793)
 merged in. This package may change as that CL is reviewed, and hopefully eventually deleted once
