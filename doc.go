@@ -18,5 +18,3 @@ merged in. This package may change as that CL is reviewed, and hopefully eventua
 the CL is merged and golang.org/x/mobile/gl/... can be used.
 */
 package gl // import "github.com/goxjs/gl"
-
-//go:generate go run gendebug.go -o gldebug.go

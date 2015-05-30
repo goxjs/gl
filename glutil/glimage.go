@@ -173,7 +173,7 @@ func (img *Image) Draw(topLeft, topRight, bottomLeft geom.Point, srcBounds image
 		// which gives:
 		//	a00 = (2*qx2 - 2*px2) / 2 = qx2 - px2
 		// and similarly for the other elements of a.
-		glimage.mvp.WriteAffine(&f32.Affine{{
+		writeAffine(glimage.mvp, &f32.Affine{{
 			qx2 - px2,
 			px2 - sx2,
 			qx2 + sx2,
@@ -208,7 +208,7 @@ func (img *Image) Draw(topLeft, topRight, bottomLeft geom.Point, srcBounds image
 		//	a10 +   0 + a12 = qy = py
 		//	  0 + a01 + a02 = sx = px
 		//	  0 + a11 + a12 = sy
-		glimage.uvp.WriteAffine(&f32.Affine{{
+		writeAffine(glimage.uvp, &f32.Affine{{
 			qx - px,
 			0,
 			px,
@@ -235,6 +235,21 @@ func (img *Image) Draw(topLeft, topRight, bottomLeft geom.Point, srcBounds image
 
 	gl.DisableVertexAttribArray(glimage.pos)
 	gl.DisableVertexAttribArray(glimage.inUV)
+}
+
+// writeAffine writes the contents of an Affine to a 3x3 matrix GL uniform.
+func writeAffine(u gl.Uniform, a *f32.Affine) {
+	var m [9]float32
+	m[0*3+0] = a[0][0]
+	m[0*3+1] = a[1][0]
+	m[0*3+2] = 0
+	m[1*3+0] = a[0][1]
+	m[1*3+1] = a[1][1]
+	m[1*3+2] = 0
+	m[2*3+0] = a[0][2]
+	m[2*3+1] = a[1][2]
+	m[2*3+2] = 1
+	gl.UniformMatrix3fv(u, m[:])
 }
 
 var quadXYCoords = f32.Bytes(binary.LittleEndian,

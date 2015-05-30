@@ -4,7 +4,6 @@
 
 // +build linux darwin
 // +build !js
-// +build !gldebug
 
 package gl
 

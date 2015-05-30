@@ -1,5 +1,4 @@
 // +build !js
-// +build !gldebug
 
 package gl
 
