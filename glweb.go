@@ -10,14 +10,16 @@ package gl
 
 import "github.com/gopherjs/gopherjs/js"
 
-// ContextSwitcher is this library's GL context switcher. It facilitates switching
-// between GL contexts, satisfying ContextSwitcher interface.
-var ContextSwitcher contextSwitcher
+var ContextWatcher contextWatcher
 
-type contextSwitcher struct{}
+type contextWatcher struct{}
 
-func (contextSwitcher) MakeContextCurrent(context interface{}) {
-	c, _ = context.(*js.Object)
+func (contextWatcher) OnBecomeCurrent(context interface{}) {
+	// context must be a WebGLRenderingContext *js.Object.
+	c = context.(*js.Object)
+}
+func (contextWatcher) OnDetach() {
+	c = nil
 }
 
 // c is the current WebGL context, or nil if there is no current context.

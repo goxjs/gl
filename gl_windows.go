@@ -12,16 +12,18 @@ import (
 	"github.com/go-gl/gl/v2.1/gl"
 )
 
-var ContextSwitcher = (interface {
-	MakeContextCurrent(context interface{})
-})(nil)
+var ContextWatcher contextWatcher
 
-func init() {
+type contextWatcher struct{}
+
+func (contextWatcher) OnBecomeCurrent(context interface{}) {
+	// Initialise gl bindings using the current context.
 	err := gl.Init()
 	if err != nil {
 		log.Fatalln("gl.Init:", err)
 	}
 }
+func (contextWatcher) OnDetach() {}
 
 func AttachShader(p Program, s Shader) {
 	gl.AttachShader(p.Value, s.Value)

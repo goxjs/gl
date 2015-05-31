@@ -31,13 +31,14 @@ import "C"
 
 import "unsafe"
 
-// ContextSwitcher is this library's GL context switcher. It facilitates switching
-// between GL contexts, satisfying ContextSwitcher interface.
-//
-// It is nil on desktop platform since GLFW C library can handle this aspect.
-var ContextSwitcher = (interface {
-	MakeContextCurrent(context interface{})
-})(nil)
+// ContextWatcher is this library's context watcher. It should be notified when context becomes current or detached,
+// satisfying ContextWatcher interface.
+var ContextWatcher contextWatcher
+
+type contextWatcher struct{}
+
+func (contextWatcher) OnBecomeCurrent(context interface{}) {}
+func (contextWatcher) OnDetach()                           {}
 
 // ActiveTexture sets the active texture unit.
 //
