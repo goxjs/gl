@@ -201,8 +201,8 @@ func Disable(cap Enum) {
 	c.Call("disable", cap)
 }
 
-func DisableVertexAttribArray(index Attrib) {
-	c.Call("disableVertexAttribArray", index.Value)
+func DisableVertexAttribArray(a Attrib) {
+	c.Call("disableVertexAttribArray", a.Value)
 }
 
 func DrawArrays(mode Enum, first, count int) {
@@ -217,8 +217,8 @@ func Enable(cap Enum) {
 	c.Call("enable", cap)
 }
 
-func EnableVertexAttribArray(index Attrib) {
-	c.Call("enableVertexAttribArray", index.Value)
+func EnableVertexAttribArray(a Attrib) {
+	c.Call("enableVertexAttribArray", a.Value)
 }
 
 func Finish() {
