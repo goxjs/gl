@@ -31,8 +31,8 @@ import "C"
 
 import "unsafe"
 
-// ContextWatcher is this library's context watcher. It should be notified when context becomes current or detached,
-// satisfying ContextWatcher interface.
+// ContextWatcher is this library's context watcher, satisfying glfw.ContextWatcher interface.
+// It must be notified when context is made current or detached.
 var ContextWatcher contextWatcher
 
 type contextWatcher struct{}

@@ -21,3 +21,28 @@ Installation
 go get -u github.com/goxjs/gl/...
 go get -u -d -tags=js github.com/goxjs/gl/...
 ```
+
+Usage
+-----
+
+This OpenGL binding has a ContextWatcher, which implements [glfw.ContextWatcher](https://godoc.org/github.com/goxjs/glfw#ContextWatcher)
+interface. Recommended usage is with github.com/goxjs/glfw package, which accepts a ContextWatcher in its Init, and takes on the responsibility
+of notifying it when context is made current or detached.
+
+```Go
+if err := glfw.Init(gl.ContextWatcher); err != nil {
+	// Handle error.
+}
+defer glfw.Terminate()
+```
+
+If you're not using a ContextWatcher-aware glfw library, you must call methods of gl.ContextWatcher yourself whenever
+you make a context current or detached.
+
+```Go
+window.MakeContextCurrent()
+gl.ContextWatcher.OnMakeCurrent(nil)
+
+glfw.DetachCurrentContext()
+gl.ContextWatcher.OnDetach()
+```
