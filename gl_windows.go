@@ -16,7 +16,7 @@ var ContextWatcher contextWatcher
 
 type contextWatcher struct{}
 
-func (contextWatcher) OnBecomeCurrent(context interface{}) {
+func (contextWatcher) OnMakeCurrent(context interface{}) {
 	// Initialise gl bindings using the current context.
 	err := gl.Init()
 	if err != nil {

@@ -37,8 +37,8 @@ var ContextWatcher contextWatcher
 
 type contextWatcher struct{}
 
-func (contextWatcher) OnBecomeCurrent(context interface{}) {}
-func (contextWatcher) OnDetach()                           {}
+func (contextWatcher) OnMakeCurrent(context interface{}) {}
+func (contextWatcher) OnDetach()                         {}
 
 // ActiveTexture sets the active texture unit.
 //

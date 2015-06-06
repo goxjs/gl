@@ -14,7 +14,7 @@ var ContextWatcher contextWatcher
 
 type contextWatcher struct{}
 
-func (contextWatcher) OnBecomeCurrent(context interface{}) {
+func (contextWatcher) OnMakeCurrent(context interface{}) {
 	// context must be a WebGLRenderingContext *js.Object.
 	c = context.(*js.Object)
 }
