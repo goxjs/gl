@@ -13,9 +13,9 @@ It supports:
 
 - Modern Browsers (desktop and mobile) via WebGL 1 backend.
 
-This is a fork of golang.org/x/mobile/gl/... packages with [CL 8793](https://go-review.googlesource.com/8793)
-merged in. This package may change as that CL is reviewed, and hopefully eventually deleted once
-the CL is merged and golang.org/x/mobile/gl/... can be used.
+This is a fork of golang.org/x/mobile/gl package with [CL 8793](https://go-review.googlesource.com/8793)
+merged in. This package is fully functional, but may eventually become superceded by the new x/mobile/gl plan.
+It will exist and be fully supported until it can be safely replaced by a better package.
 
 Usage
 
