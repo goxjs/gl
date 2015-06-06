@@ -12,15 +12,20 @@ import (
 	"github.com/go-gl/gl/v2.1/gl"
 )
 
-var ContextWatcher contextWatcher
+var ContextWatcher = new(contextWatcher)
 
-type contextWatcher struct{}
+type contextWatcher struct {
+	initGL bool
+}
 
-func (contextWatcher) OnMakeCurrent(context interface{}) {
-	// Initialise gl bindings using the current context.
-	err := gl.Init()
-	if err != nil {
-		log.Fatalln("gl.Init:", err)
+func (cw *contextWatcher) OnMakeCurrent(context interface{}) {
+	if !cw.initGL {
+		// Initialise gl bindings using the current context.
+		err := gl.Init()
+		if err != nil {
+			log.Fatalln("gl.Init:", err)
+		}
+		cw.initGL = true
 	}
 }
 func (contextWatcher) OnDetach() {}
