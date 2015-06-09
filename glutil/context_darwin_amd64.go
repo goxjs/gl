@@ -36,7 +36,11 @@ void CGCreate(CGLContextObj* ctx) {
 */
 import "C"
 
-import "runtime"
+import (
+	"runtime"
+
+	"github.com/goxjs/gl"
+)
 
 // contextGL holds a copy of the OpenGL Context from thread-local storage.
 //
@@ -54,6 +58,7 @@ func createContext() *contextGL {
 
 	c := new(contextGL)
 	C.CGCreate(&c.ctx)
+	gl.ContextWatcher.OnMakeCurrent(nil)
 
 	// Using attribute arrays in OpenGL 3.3 requires the use of a VBA.
 	// But VBAs don't exist in ES 2. So we bind a default one.
@@ -69,6 +74,7 @@ func createContext() *contextGL {
 func (c *contextGL) destroy() {
 	C.CGLUnlockContext(c.ctx)
 	C.CGLSetCurrentContext(nil)
+	gl.ContextWatcher.OnDetach()
 	C.CGLDestroyContext(c.ctx)
 	c.ctx = nil
 	runtime.UnlockOSThread()

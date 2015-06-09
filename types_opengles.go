@@ -2,28 +2,23 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build linux darwin
-// +build !js
+// +build darwin linux
+// +build arm arm64
 
 package gl
 
 /*
-#cgo darwin,amd64  LDFLAGS: -framework OpenGL
-#cgo darwin,arm    LDFLAGS: -framework OpenGLES
-#cgo linux         LDFLAGS: -lGLESv2
+#cgo darwin LDFLAGS: -framework OpenGLES
+#cgo linux  LDFLAGS: -lGLESv2
 
-#cgo darwin,amd64  CFLAGS: -Dos_darwin_amd64
-#cgo darwin,arm    CFLAGS: -Dos_darwin_arm
-#cgo linux         CFLAGS: -Dos_linux
+#cgo darwin CFLAGS: -Dos_darwin_arm
+#cgo linux  CFLAGS: -Dos_linux_arm
 
-#ifdef os_linux
-#include <GLES2/gl2.h>
-#endif
 #ifdef os_darwin_arm
 #include <OpenGLES/ES2/gl.h>
 #endif
-#ifdef os_darwin_amd64
-#include <OpenGL/gl3.h>
+#ifdef os_linux_arm
+#include <GLES2/gl2.h>
 #endif
 
 void blendColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a) { glBlendColor(r, g, b, a); }
@@ -33,6 +28,59 @@ void depthRangef(GLfloat n, GLfloat f)                      { glDepthRangef(n, f
 void sampleCoverage(GLfloat v, GLboolean invert)            { glSampleCoverage(v, invert); }
 */
 import "C"
+
+type Enum uint32
+
+type Attrib struct {
+	Value uint
+}
+
+type Program struct {
+	Value uint32
+}
+
+type Shader struct {
+	Value uint32
+}
+
+type Buffer struct {
+	Value uint32
+}
+
+type Framebuffer struct {
+	Value uint32
+}
+
+type Renderbuffer struct {
+	Value uint32
+}
+
+type Texture struct {
+	Value uint32
+}
+
+type Uniform struct {
+	Value int32
+}
+
+func (v Attrib) c() C.GLuint       { return C.GLuint(v.Value) }
+func (v Enum) c() C.GLenum         { return C.GLenum(v) }
+func (v Program) c() C.GLuint      { return C.GLuint(v.Value) }
+func (v Shader) c() C.GLuint       { return C.GLuint(v.Value) }
+func (v Buffer) c() C.GLuint       { return C.GLuint(v.Value) }
+func (v Framebuffer) c() C.GLuint  { return C.GLuint(v.Value) }
+func (v Renderbuffer) c() C.GLuint { return C.GLuint(v.Value) }
+func (v Texture) c() C.GLuint      { return C.GLuint(v.Value) }
+func (v Uniform) c() C.GLint       { return C.GLint(v.Value) }
+
+func (v Attrib) Valid() bool       { return v.Value != 0 }
+func (v Program) Valid() bool      { return v.Value != 0 }
+func (v Shader) Valid() bool       { return v.Value != 0 }
+func (v Buffer) Valid() bool       { return v.Value != 0 }
+func (v Framebuffer) Valid() bool  { return v.Value != 0 }
+func (v Renderbuffer) Valid() bool { return v.Value != 0 }
+func (v Texture) Valid() bool      { return v.Value != 0 }
+func (v Uniform) Valid() bool      { return v.Value != 0 }
 
 func glBoolean(b bool) C.GLboolean {
 	if b {
