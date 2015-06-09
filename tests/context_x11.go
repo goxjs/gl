@@ -4,7 +4,7 @@
 
 // +build linux,!android
 
-package glutil
+package tests
 
 /*
 #cgo LDFLAGS: -lEGL

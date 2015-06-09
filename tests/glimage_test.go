@@ -6,7 +6,7 @@
 
 // TODO(crawshaw): Run tests on other OSs when more contexts are supported.
 
-package glutil
+package tests
 
 import (
 	"image"
@@ -70,7 +70,7 @@ func TestImage(t *testing.T) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 	gl.Viewport(0, 0, pixW, pixH)
 
-	m := NewImage(src.Bounds().Dx(), src.Bounds().Dy())
+	m := _NewImage(src.Bounds().Dx(), src.Bounds().Dy())
 	b := m.RGBA.Bounds()
 	draw.Draw(m.RGBA, b, src, src.Bounds().Min, draw.Src)
 	m.Upload()
