@@ -3,9 +3,8 @@
 // license that can be found in the LICENSE file.
 
 // +build linux darwin
-// +build !js
 
-package glutil
+package tests
 
 import (
 	"encoding/binary"
@@ -13,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/goxjs/gl"
+	"github.com/goxjs/gl/glutil"
 	"golang.org/x/mobile/f32"
 	"golang.org/x/mobile/geom"
 )
@@ -31,7 +31,7 @@ var glimage struct {
 
 func glInit() {
 	var err error
-	glimage.program, err = CreateProgram(vertexShader, fragmentShader)
+	glimage.program, err = glutil.CreateProgram(vertexShader, fragmentShader)
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func glInit() {
 //
 // The number of active Images must fit in the system's OpenGL texture
 // limit. The typical use of an Image is as a texture atlas.
-type Image struct {
+type _Image struct {
 	*image.RGBA
 
 	Texture   gl.Texture
@@ -69,7 +69,7 @@ type Image struct {
 // NewImage creates an Image of the given size.
 //
 // Both a host-memory *image.RGBA and a GL texture are created.
-func NewImage(w, h int) *Image {
+func _NewImage(w, h int) *_Image {
 	dx := roundToPower2(w)
 	dy := roundToPower2(h)
 
@@ -80,7 +80,7 @@ func NewImage(w, h int) *Image {
 
 	glimage.Do(glInit)
 
-	img := &Image{
+	img := &_Image{
 		RGBA:      m.SubImage(image.Rect(0, 0, w, h)).(*image.RGBA),
 		Texture:   gl.CreateTexture(),
 		texWidth:  dx,
@@ -107,14 +107,14 @@ func roundToPower2(x int) int {
 }
 
 // Upload copies the host image data to the GL device.
-func (img *Image) Upload() {
+func (img *_Image) Upload() {
 	gl.BindTexture(gl.TEXTURE_2D, img.Texture)
 	gl.TexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, img.texWidth, img.texHeight, gl.RGBA, gl.UNSIGNED_BYTE, img.Pix)
 }
 
 // Draw draws the srcBounds part of the image onto a parallelogram, defined by
 // three of its corners, in the current GL framebuffer.
-func (img *Image) Draw(topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
+func (img *_Image) Draw(topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
 	// TODO(crawshaw): Adjust viewport for the top bar on android?
 	gl.UseProgram(glimage.program)
 

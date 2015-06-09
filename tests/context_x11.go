@@ -4,7 +4,7 @@
 
 // +build linux,!android
 
-package glutil
+package tests
 
 /*
 #cgo LDFLAGS: -lEGL
@@ -84,6 +84,8 @@ import "C"
 
 import (
 	"runtime"
+
+	"github.com/goxjs/gl"
 )
 
 type contextGL struct {
@@ -96,10 +98,12 @@ func createContext() *contextGL {
 	runtime.LockOSThread()
 	c := &contextGL{}
 	C.createContext(&c.dpy, &c.ctx, &c.surf)
+	gl.ContextWatcher.OnMakeCurrent(nil)
 	return c
 }
 
 func (c *contextGL) destroy() {
 	C.destroyContext(c.dpy, c.ctx, c.surf)
+	gl.ContextWatcher.OnDetach()
 	runtime.UnlockOSThread()
 }
