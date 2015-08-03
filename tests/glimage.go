@@ -13,7 +13,7 @@ import (
 
 	"github.com/goxjs/gl"
 	"github.com/goxjs/gl/glutil"
-	"golang.org/x/mobile/event"
+	"golang.org/x/mobile/event/config"
 	"golang.org/x/mobile/exp/f32"
 	"golang.org/x/mobile/geom"
 )
@@ -115,7 +115,7 @@ func (img *_Image) Upload() {
 
 // Draw draws the srcBounds part of the image onto a parallelogram, defined by
 // three of its corners, in the current GL framebuffer.
-func (img *_Image) Draw(c event.Config, topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
+func (img *_Image) Draw(c config.Event, topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
 	// TODO(crawshaw): Adjust viewport for the top bar on android?
 	gl.UseProgram(glimage.program)
 
@@ -150,12 +150,12 @@ func (img *_Image) Draw(c event.Config, topLeft, topRight, bottomLeft geom.Point
 		// First of all, convert from geom space to framebuffer space. For
 		// later convenience, we divide everything by 2 here: px2 is half of
 		// the P.X co-ordinate (in framebuffer space).
-		px2 := -0.5 + float32(topLeft.X/c.Width)
-		py2 := +0.5 - float32(topLeft.Y/c.Height)
-		qx2 := -0.5 + float32(topRight.X/c.Width)
-		qy2 := +0.5 - float32(topRight.Y/c.Height)
-		sx2 := -0.5 + float32(bottomLeft.X/c.Width)
-		sy2 := +0.5 - float32(bottomLeft.Y/c.Height)
+		px2 := -0.5 + float32(topLeft.X/c.WidthPt)
+		py2 := +0.5 - float32(topLeft.Y/c.HeightPt)
+		qx2 := -0.5 + float32(topRight.X/c.WidthPt)
+		qy2 := +0.5 - float32(topRight.Y/c.HeightPt)
+		sx2 := -0.5 + float32(bottomLeft.X/c.WidthPt)
+		sy2 := +0.5 - float32(bottomLeft.Y/c.HeightPt)
 		// Next, solve for the affine transformation matrix
 		//	    [ a00 a01 a02 ]
 		//	a = [ a10 a11 a12 ]
