@@ -13,7 +13,7 @@ import (
 
 	"github.com/goxjs/gl"
 	"github.com/goxjs/gl/glutil"
-	"golang.org/x/mobile/event/config"
+	"golang.org/x/mobile/event/size"
 	"golang.org/x/mobile/exp/f32"
 	"golang.org/x/mobile/geom"
 )
@@ -115,7 +115,7 @@ func (img *_Image) Upload() {
 
 // Draw draws the srcBounds part of the image onto a parallelogram, defined by
 // three of its corners, in the current GL framebuffer.
-func (img *_Image) Draw(c config.Event, topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
+func (img *_Image) Draw(c size.Event, topLeft, topRight, bottomLeft geom.Point, srcBounds image.Rectangle) {
 	// TODO(crawshaw): Adjust viewport for the top bar on android?
 	gl.UseProgram(glimage.program)
 
