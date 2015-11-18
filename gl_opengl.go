@@ -776,7 +776,7 @@ func LinkProgram(p Program) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glPixelStorei.xhtml
 func PixelStorei(pname Enum, param int32) {
-	panic("PixelStorei: not yet implemented")
+	gl.PixelStorei(uint32(pname), param)
 }
 
 // PolygonOffset sets the scaling factors for depth offsets.
@@ -834,42 +834,42 @@ func ShaderSource(s Shader, src string) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilFunc.xhtml
 func StencilFunc(fn Enum, ref int, mask uint32) {
-	panic("StencilFunc: not yet implemented")
+	gl.StencilFunc(uint32(fn), int32(ref), mask)
 }
 
 // StencilFunc sets the front or back stencil test reference value.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilFuncSeparate.xhtml
 func StencilFuncSeparate(face, fn Enum, ref int, mask uint32) {
-	panic("StencilFuncSeparate: not yet implemented")
+	gl.StencilFuncSeparate(uint32(face), uint32(fn), int32(ref), mask)
 }
 
 // StencilMask controls the writing of bits in the stencil planes.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilMask.xhtml
 func StencilMask(mask uint32) {
-	panic("StencilMask: not yet implemented")
+	gl.StencilMask(mask)
 }
 
 // StencilMaskSeparate controls the writing of bits in the stencil planes.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilMaskSeparate.xhtml
 func StencilMaskSeparate(face Enum, mask uint32) {
-	panic("StencilMaskSeparate: not yet implemented")
+	gl.StencilMaskSeparate(uint32(face), mask)
 }
 
 // StencilOp sets front and back stencil test actions.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilOp.xhtml
 func StencilOp(fail, zfail, zpass Enum) {
-	panic("StencilOp: not yet implemented")
+	gl.StencilOp(uint32(fail), uint32(zfail), uint32(zpass))
 }
 
 // StencilOpSeparate sets front or back stencil tests.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glStencilOpSeparate.xhtml
 func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
-	panic("StencilOpSeparate: not yet implemented")
+	gl.StencilOpSeparate(uint32(face), uint32(sfail), uint32(dpfail), uint32(dppass))
 }
 
 // TexImage2D writes a 2D texture image.
@@ -965,7 +965,7 @@ func Uniform2f(dst Uniform, v0, v1 float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform2fv(dst Uniform, src []float32) {
-	panic("Uniform2fv: not yet implemented")
+	gl.Uniform2fv(dst.Value, int32(len(src)), &src[0])
 }
 
 // Uniform2i writes an ivec2 uniform variable.
