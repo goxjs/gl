@@ -965,7 +965,7 @@ func Uniform2f(dst Uniform, v0, v1 float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform2fv(dst Uniform, src []float32) {
-	gl.Uniform2fv(dst.Value, int32(len(src)), &src[0])
+	gl.Uniform2fv(dst.Value, int32(len(src)/2), &src[0])
 }
 
 // Uniform2i writes an ivec2 uniform variable.
