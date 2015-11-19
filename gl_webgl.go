@@ -428,7 +428,7 @@ func LinkProgram(p Program) {
 }
 
 func PixelStorei(pname Enum, param int32) {
-	panic("PixelStorei: not yet implemented")
+	c.Call("pixelStorei", pname, param)
 }
 
 func PolygonOffset(factor, units float32) {
