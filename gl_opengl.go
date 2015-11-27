@@ -2,8 +2,6 @@
 
 package gl
 
-// TODO: Complete implementation of all remaining functions, search for `panic("*: not yet implemented")`.
-
 import (
 	"log"
 	"strings"
@@ -203,14 +201,14 @@ func CompressedTexImage2D(target Enum, level int, internalformat Enum, width, he
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glCompressedTexSubImage2D.xhtml
 func CompressedTexSubImage2D(target Enum, level, xoffset, yoffset, width, height int, format Enum, data []byte) {
-	panic("CompressedTexSubImage2D: not yet implemented")
+	gl.CompressedTexSubImage2D(uint32(target), int32(level), int32(xoffset), int32(yoffset), int32(width), int32(height), uint32(format), int32(len(data)), gl.Ptr(data))
 }
 
 // CopyTexImage2D writes a 2D texture from the current framebuffer.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glCopyTexImage2D.xhtml
 func CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, height, border int) {
-	panic("CopyTexImage2D: not yet implemented")
+	gl.CopyTexImage2D(uint32(target), int32(level), uint32(internalformat), int32(x), int32(y), int32(width), int32(height), int32(border))
 }
 
 // CopyTexSubImage2D writes a 2D texture subregion from the
@@ -218,7 +216,7 @@ func CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, he
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glCopyTexSubImage2D.xhtml
 func CopyTexSubImage2D(target Enum, level, xoffset, yoffset, x, y, width, height int) {
-	panic("CopyTexSubImage2D: not yet implemented")
+	gl.CopyTexSubImage2D(uint32(target), int32(level), int32(xoffset), int32(yoffset), int32(x), int32(y), int32(width), int32(height))
 }
 
 // CreateBuffer creates a buffer object.
@@ -432,7 +430,7 @@ func FramebufferRenderbuffer(target, attachment, rbTarget Enum, rb Renderbuffer)
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glFramebufferTexture2D.xhtml
 func FramebufferTexture2D(target, attachment, texTarget Enum, t Texture, level int) {
-	panic("FramebufferTexture2D: not yet implemented")
+	gl.FramebufferTexture2D(uint32(target), uint32(attachment), uint32(texTarget), t.Value, int32(level))
 }
 
 // FrontFace defines which polygons are front-facing.
@@ -487,7 +485,16 @@ func GetActiveUniform(p Program, index uint32) (name string, size int, ty Enum) 
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetAttachedShaders.xhtml
 func GetAttachedShaders(p Program) []Shader {
-	panic("GetAttachedShaders: not yet implemented")
+	shadersLen := GetProgrami(p, ATTACHED_SHADERS)
+	var n int32
+	buf := make([]uint32, shadersLen)
+	gl.GetAttachedShaders(uint32(p.Value), int32(shadersLen), &n, &buf[0])
+	buf = buf[:int(n)]
+	shaders := make([]Shader, int(n))
+	for i, s := range buf {
+		shaders[i] = Shader{Value: uint32(s)}
+	}
+	return shaders
 }
 
 // GetAttribLocation returns the location of an attribute variable.
@@ -503,14 +510,14 @@ func GetAttribLocation(p Program, name string) Attrib {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGet.xhtml
 func GetBooleanv(dst []bool, pname Enum) {
-	panic("GetBooleanv: not yet implemented")
+	gl.GetBooleanv(uint32(pname), &dst[0])
 }
 
 // GetFloatv returns the float values of parameter pname.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGet.xhtml
 func GetFloatv(dst []float32, pname Enum) {
-	panic("GetFloatv: not yet implemented")
+	gl.GetFloatv(uint32(pname), &dst[0])
 }
 
 // GetIntegerv returns the int values of parameter pname.
@@ -519,7 +526,7 @@ func GetFloatv(dst []float32, pname Enum) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGet.xhtml
 func GetIntegerv(pname Enum, data []int32) {
-	panic("GetIntegerv: not yet implemented")
+	gl.GetIntegerv(uint32(pname), &data[0])
 }
 
 // GetInteger returns the int value of parameter pname.
@@ -552,7 +559,9 @@ func GetError() Enum {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetFramebufferAttachmentParameteriv.xhtml
 func GetFramebufferAttachmentParameteri(target, attachment, pname Enum) int {
-	panic("GetFramebufferAttachmentParameteri: not yet implemented")
+	var param int32
+	gl.GetFramebufferAttachmentParameteriv(uint32(target), uint32(attachment), uint32(pname), &param)
+	return int(param)
 }
 
 // GetProgrami returns a parameter value for a program.
@@ -583,7 +592,9 @@ func GetProgramInfoLog(p Program) string {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetRenderbufferParameteriv.xhtml
 func GetRenderbufferParameteri(target, pname Enum) int {
-	panic("GetRenderbufferParameteri: not yet implemented")
+	var result int32
+	gl.GetRenderbufferParameteriv(uint32(target), uint32(pname), &result)
+	return int(result)
 }
 
 // GetRenderbufferParameteri returns a parameter value for a shader.
@@ -615,14 +626,24 @@ func GetShaderInfoLog(s Shader) string {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetShaderPrecisionFormat.xhtml
 func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeLow, rangeHigh, precision int) {
-	panic("GetShaderPrecisionFormat: not yet implemented")
+	var cRange [2]int32
+	var cPrecision int32
+
+	gl.GetShaderPrecisionFormat(uint32(shadertype), uint32(precisiontype), &cRange[0], &cPrecision)
+	return int(cRange[0]), int(cRange[1]), int(cPrecision)
 }
 
 // GetShaderSource returns source code of shader s.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetShaderSource.xhtml
 func GetShaderSource(s Shader) string {
-	panic("GetShaderSource: not yet implemented")
+	sourceLen := GetShaderi(s, gl.SHADER_SOURCE_LENGTH)
+	if sourceLen == 0 {
+		return ""
+	}
+	buf := make([]byte, sourceLen)
+	gl.GetShaderSource(s.Value, int32(sourceLen), nil, &buf[0])
+	return string(buf)
 }
 
 // GetString reports current GL state.
@@ -643,28 +664,28 @@ func GetString(pname Enum) string {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetTexParameter.xhtml
 func GetTexParameterfv(dst []float32, target, pname Enum) {
-	panic("GetTexParameterfv: not yet implemented")
+	gl.GetTexParameterfv(uint32(target), uint32(pname), &dst[0])
 }
 
 // GetTexParameteriv returns the int values of a texture parameter.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetTexParameter.xhtml
 func GetTexParameteriv(dst []int32, target, pname Enum) {
-	panic("GetTexParameteriv: not yet implemented")
+	gl.GetTexParameteriv(uint32(target), uint32(pname), &dst[0])
 }
 
 // GetUniformfv returns the float values of a uniform variable.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetUniform.xhtml
 func GetUniformfv(dst []float32, src Uniform, p Program) {
-	panic("GetUniformfv: not yet implemented")
+	gl.GetUniformfv(p.Value, src.Value, &dst[0])
 }
 
 // GetUniformiv returns the float values of a uniform variable.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetUniform.xhtml
 func GetUniformiv(dst []int32, src Uniform, p Program) {
-	panic("GetUniformiv: not yet implemented")
+	gl.GetUniformiv(p.Value, src.Value, &dst[0])
 }
 
 // GetUniformLocation returns the location of a uniform variable.
@@ -678,91 +699,95 @@ func GetUniformLocation(p Program, name string) Uniform {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetVertexAttrib.xhtml
 func GetVertexAttribf(src Attrib, pname Enum) float32 {
-	panic("GetVertexAttribf: not yet implemented")
+	var result float32
+	gl.GetVertexAttribfv(uint32(src.Value), uint32(pname), &result)
+	return result
 }
 
 // GetVertexAttribfv reads float values of a vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetVertexAttrib.xhtml
 func GetVertexAttribfv(dst []float32, src Attrib, pname Enum) {
-	panic("GetVertexAttribfv: not yet implemented")
+	gl.GetVertexAttribfv(uint32(src.Value), uint32(pname), &dst[0])
 }
 
 // GetVertexAttribi reads the int value of a vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetVertexAttrib.xhtml
 func GetVertexAttribi(src Attrib, pname Enum) int32 {
-	panic("GetVertexAttribi: not yet implemented")
+	var result int32
+	gl.GetVertexAttribiv(uint32(src.Value), uint32(pname), &result)
+	return result
 }
 
 // GetVertexAttribiv reads int values of a vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetVertexAttrib.xhtml
 func GetVertexAttribiv(dst []int32, src Attrib, pname Enum) {
-	panic("GetVertexAttribiv: not yet implemented")
+	gl.GetVertexAttribiv(uint32(src.Value), uint32(pname), &dst[0])
 }
 
 // Hint sets implementation-specific modes.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glHint.xhtml
 func Hint(target, mode Enum) {
-	panic("Hint: not yet implemented")
+	gl.Hint(uint32(target), uint32(mode))
 }
 
 // IsBuffer reports if b is a valid buffer.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsBuffer.xhtml
 func IsBuffer(b Buffer) bool {
-	panic("IsBuffer: not yet implemented")
+	return gl.IsBuffer(b.Value)
 }
 
 // IsEnabled reports if cap is an enabled capability.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsEnabled.xhtml
 func IsEnabled(cap Enum) bool {
-	panic("IsEnabled: not yet implemented")
+	return gl.IsEnabled(uint32(cap))
 }
 
 // IsFramebuffer reports if fb is a valid frame buffer.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsFramebuffer.xhtml
 func IsFramebuffer(fb Framebuffer) bool {
-	panic("IsFramebuffer: not yet implemented")
+	return gl.IsFramebuffer(fb.Value)
 }
 
 // IsProgram reports if p is a valid program object.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsProgram.xhtml
 func IsProgram(p Program) bool {
-	panic("IsProgram: not yet implemented")
+	return gl.IsProgram(p.Value)
 }
 
 // IsRenderbuffer reports if rb is a valid render buffer.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsRenderbuffer.xhtml
 func IsRenderbuffer(rb Renderbuffer) bool {
-	panic("IsRenderbuffer: not yet implemented")
+	return gl.IsRenderbuffer(rb.Value)
 }
 
 // IsShader reports if s is valid shader.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsShader.xhtml
 func IsShader(s Shader) bool {
-	panic("IsShader: not yet implemented")
+	return gl.IsShader(s.Value)
 }
 
 // IsTexture reports if t is a valid texture.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glIsTexture.xhtml
 func IsTexture(t Texture) bool {
-	panic("IsTexture: not yet implemented")
+	return gl.IsTexture(t.Value)
 }
 
 // LineWidth specifies the width of lines.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glLineWidth.xhtml
 func LineWidth(width float32) {
-	panic("LineWidth: not yet implemented")
+	gl.LineWidth(width)
 }
 
 // LinkProgram links the specified program.
@@ -797,7 +822,7 @@ func ReadPixels(dst []byte, x, y, width, height int, format, ty Enum) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glReleaseShaderCompiler.xhtml
 func ReleaseShaderCompiler() {
-	panic("ReleaseShaderCompiler: not yet implemented")
+	gl.ReleaseShaderCompiler()
 }
 
 // RenderbufferStorage establishes the data storage, format, and
@@ -894,14 +919,14 @@ func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty E
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glTexParameter.xhtml
 func TexParameterf(target, pname Enum, param float32) {
-	panic("TexParameterf: not yet implemented")
+	gl.TexParameterf(uint32(target), uint32(pname), param)
 }
 
 // TexParameterfv sets a float texture parameter array.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glTexParameter.xhtml
 func TexParameterfv(target, pname Enum, params []float32) {
-	panic("TexParameterfv: not yet implemented")
+	gl.TexParameterfv(uint32(target), uint32(pname), &params[0])
 }
 
 // TexParameteri sets an integer texture parameter.
@@ -915,7 +940,7 @@ func TexParameteri(target, pname Enum, param int) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glTexParameter.xhtml
 func TexParameteriv(target, pname Enum, params []int32) {
-	panic("TexParameteriv: not yet implemented")
+	gl.TexParameteriv(uint32(target), uint32(pname), &params[0])
 }
 
 // Uniform1f writes a float uniform variable.
@@ -929,7 +954,7 @@ func Uniform1f(dst Uniform, v float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform1fv(dst Uniform, src []float32) {
-	panic("Uniform1fv: not yet implemented")
+	gl.Uniform1fv(dst.Value, int32(len(src)), &src[0])
 }
 
 // Uniform1i writes an int uniform variable.
@@ -951,14 +976,14 @@ func Uniform1i(dst Uniform, v int) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform1iv(dst Uniform, src []int32) {
-	panic("Uniform1iv: not yet implemented")
+	gl.Uniform1iv(dst.Value, int32(len(src)), &src[0])
 }
 
 // Uniform2f writes a vec2 uniform variable.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform2f(dst Uniform, v0, v1 float32) {
-	panic("Uniform2f: not yet implemented")
+	gl.Uniform2f(dst.Value, v0, v1)
 }
 
 // Uniform2fv writes a vec2 uniform array of len(src)/2 elements.
@@ -972,14 +997,14 @@ func Uniform2fv(dst Uniform, src []float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform2i(dst Uniform, v0, v1 int) {
-	panic("Uniform2i: not yet implemented")
+	gl.Uniform2i(dst.Value, int32(v0), int32(v1))
 }
 
 // Uniform2iv writes an ivec2 uniform array of len(src)/2 elements.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform2iv(dst Uniform, src []int32) {
-	panic("Uniform2iv: not yet implemented")
+	gl.Uniform2iv(dst.Value, int32(len(src)/2), &src[0])
 }
 
 // Uniform3f writes a vec3 uniform variable.
@@ -993,21 +1018,21 @@ func Uniform3f(dst Uniform, v0, v1, v2 float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform3fv(dst Uniform, src []float32) {
-	panic("Uniform3fv: not yet implemented")
+	gl.Uniform3fv(dst.Value, int32(len(src)/3), &src[0])
 }
 
 // Uniform3i writes an ivec3 uniform variable.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform3i(dst Uniform, v0, v1, v2 int32) {
-	panic("Uniform3i: not yet implemented")
+	gl.Uniform3i(dst.Value, v0, v1, v2)
 }
 
 // Uniform3iv writes an ivec3 uniform array of len(src)/3 elements.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform3iv(dst Uniform, src []int32) {
-	panic("Uniform3iv: not yet implemented")
+	gl.Uniform3iv(dst.Value, int32(len(src)/3), &src[0])
 }
 
 // Uniform4f writes a vec4 uniform variable.
@@ -1028,14 +1053,14 @@ func Uniform4fv(dst Uniform, src []float32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform4i(dst Uniform, v0, v1, v2, v3 int32) {
-	panic("Uniform4i: not yet implemented")
+	gl.Uniform4i(dst.Value, v0, v1, v2, v3)
 }
 
 // Uniform4i writes an ivec4 uniform array of len(src)/4 elements.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func Uniform4iv(dst Uniform, src []int32) {
-	panic("Uniform4iv: not yet implemented")
+	gl.Uniform4iv(dst.Value, int32(len(src)/4), &src[0])
 }
 
 // UniformMatrix2fv writes 2x2 matrices. Each matrix uses four
@@ -1045,7 +1070,7 @@ func Uniform4iv(dst Uniform, src []int32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func UniformMatrix2fv(dst Uniform, src []float32) {
-	panic("UniformMatrix2fv: not yet implemented")
+	gl.UniformMatrix2fv(dst.Value, int32(len(src)/4), false, &src[0])
 }
 
 // UniformMatrix3fv writes 3x3 matrices. Each matrix uses nine
@@ -1082,63 +1107,64 @@ func UseProgram(p Program) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glValidateProgram.xhtml
 func ValidateProgram(p Program) {
-	gl.ValidateProgram(p.Value)
+	gl.ValidateProgram(uint32(p.Value))
 }
 
 // VertexAttrib1f writes a float vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib1f(dst Attrib, x float32) {
-	panic("VertexAttrib1f: not yet implemented")
+	gl.VertexAttrib1f(uint32(dst.Value), x)
 }
 
 // VertexAttrib1fv writes a float vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib1fv(dst Attrib, src []float32) {
-	panic("VertexAttrib1fv: not yet implemented")
+	gl.VertexAttrib1fv(uint32(dst.Value), &src[0])
 }
 
 // VertexAttrib2f writes a vec2 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib2f(dst Attrib, x, y float32) {
-	panic("VertexAttrib2f: not yet implemented")
+	gl.VertexAttrib2f(uint32(dst.Value), x, y)
 }
 
 // VertexAttrib2fv writes a vec2 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib2fv(dst Attrib, src []float32) {
-	panic("VertexAttrib2fv: not yet implemented")
+	gl.VertexAttrib2fv(uint32(dst.Value), &src[0])
 }
 
 // VertexAttrib3f writes a vec3 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib3f(dst Attrib, x, y, z float32) {
-	panic("VertexAttrib3f: not yet implemented")
+	gl.VertexAttrib3f(uint32(dst.Value), x, y, z)
 }
 
 // VertexAttrib3fv writes a vec3 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib3fv(dst Attrib, src []float32) {
-	panic("VertexAttrib3fv: not yet implemented")
+	gl.VertexAttrib3fv(uint32(dst.Value), &src[0])
 }
 
 // VertexAttrib4f writes a vec4 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib4f(dst Attrib, x, y, z, w float32) {
-	panic("VertexAttrib4f: not yet implemented")
+	gl.VertexAttrib4f(uint32(dst.Value), x, y, z, w)
+
 }
 
 // VertexAttrib4fv writes a vec4 vertex attribute.
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib4fv(dst Attrib, src []float32) {
-	panic("VertexAttrib4fv: not yet implemented")
+	gl.VertexAttrib4fv(uint32(dst.Value), &src[0])
 }
 
 // VertexAttribPointer uses a bound buffer to define vertex attribute data.
