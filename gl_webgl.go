@@ -278,6 +278,7 @@ func GetAttribLocation(p Program, name string) Attrib {
 }
 
 func GetBooleanv(dst []bool, pname Enum) {
+	println("GetBooleanv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getParameter", pname)
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -286,6 +287,7 @@ func GetBooleanv(dst []bool, pname Enum) {
 }
 
 func GetFloatv(dst []float32, pname Enum) {
+	println("GetFloatv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getParameter", pname)
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -294,6 +296,7 @@ func GetFloatv(dst []float32, pname Enum) {
 }
 
 func GetIntegerv(pname Enum, data []int32) {
+	println("GetIntegerv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getParameter", pname)
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -354,6 +357,7 @@ func GetShaderInfoLog(s Shader) string {
 }
 
 func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeMin, rangeMax, precision int) {
+	println("GetShaderPrecisionFormat: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	format := c.Call("getShaderPrecisionFormat", shadertype, precisiontype)
 	rangeMin = format.Get("rangeMin").Int()
 	rangeMax = format.Get("rangeMax").Int()
@@ -378,6 +382,7 @@ func GetTexParameteriv(dst []int32, target, pname Enum) {
 }
 
 func GetUniformfv(dst []float32, src Uniform, p Program) {
+	println("GetUniformfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getUniform")
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -386,6 +391,7 @@ func GetUniformfv(dst []float32, src Uniform, p Program) {
 }
 
 func GetUniformiv(dst []int32, src Uniform, p Program) {
+	println("GetUniformiv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getUniform")
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -402,6 +408,7 @@ func GetVertexAttribf(src Attrib, pname Enum) float32 {
 }
 
 func GetVertexAttribfv(dst []float32, src Attrib, pname Enum) {
+	println("GetVertexAttribfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getVertexAttrib")
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -414,6 +421,7 @@ func GetVertexAttribi(src Attrib, pname Enum) int32 {
 }
 
 func GetVertexAttribiv(dst []int32, src Attrib, pname Enum) {
+	println("GetVertexAttribiv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getVertexAttrib")
 	length := result.Length()
 	for i := 0; i < length; i++ {
@@ -470,6 +478,7 @@ func PolygonOffset(factor, units float32) {
 }
 
 func ReadPixels(dst []byte, x, y, width, height int, format, ty Enum) {
+	println("ReadPixels: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	if ty == Enum(UNSIGNED_BYTE) {
 		c.Call("readPixels", x, y, width, height, format, ty, dst)
 	} else {
@@ -538,6 +547,7 @@ func TexParameterf(target, pname Enum, param float32) {
 }
 
 func TexParameterfv(target, pname Enum, params []float32) {
+	println("TexParameterfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	for _, param := range params {
 		c.Call("texParameterf", target, pname, param)
 	}
@@ -548,6 +558,7 @@ func TexParameteri(target, pname Enum, param int) {
 }
 
 func TexParameteriv(target, pname Enum, params []int32) {
+	println("TexParameteriv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	for _, param := range params {
 		c.Call("texParameteri", target, pname, param)
 	}

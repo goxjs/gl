@@ -485,6 +485,7 @@ func GetActiveUniform(p Program, index uint32) (name string, size int, ty Enum) 
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetAttachedShaders.xhtml
 func GetAttachedShaders(p Program) []Shader {
+	log.Println("GetAttachedShaders: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	shadersLen := GetProgrami(p, ATTACHED_SHADERS)
 	var n int32
 	buf := make([]uint32, shadersLen)
@@ -559,6 +560,7 @@ func GetError() Enum {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetFramebufferAttachmentParameteriv.xhtml
 func GetFramebufferAttachmentParameteri(target, attachment, pname Enum) int {
+	log.Println("GetFramebufferAttachmentParameteri: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	var param int32
 	gl.GetFramebufferAttachmentParameteriv(uint32(target), uint32(attachment), uint32(pname), &param)
 	return int(param)
@@ -592,6 +594,7 @@ func GetProgramInfoLog(p Program) string {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetRenderbufferParameteriv.xhtml
 func GetRenderbufferParameteri(target, pname Enum) int {
+	log.Println("GetRenderbufferParameteri: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	var result int32
 	gl.GetRenderbufferParameteriv(uint32(target), uint32(pname), &result)
 	return int(result)
@@ -626,6 +629,7 @@ func GetShaderInfoLog(s Shader) string {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetShaderPrecisionFormat.xhtml
 func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeLow, rangeHigh, precision int) {
+	log.Println("GetShaderPrecisionFormat: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	var cRange [2]int32
 	var cPrecision int32
 
@@ -637,6 +641,7 @@ func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeLow, rangeHi
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetShaderSource.xhtml
 func GetShaderSource(s Shader) string {
+	log.Println("GetShaderSource: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	sourceLen := GetShaderi(s, gl.SHADER_SOURCE_LENGTH)
 	if sourceLen == 0 {
 		return ""
@@ -699,6 +704,7 @@ func GetUniformLocation(p Program, name string) Uniform {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glGetVertexAttrib.xhtml
 func GetVertexAttribf(src Attrib, pname Enum) float32 {
+	log.Println("GetVertexAttribf: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	var result float32
 	gl.GetVertexAttribfv(uint32(src.Value), uint32(pname), &result)
 	return result
@@ -1070,7 +1076,7 @@ func Uniform4iv(dst Uniform, src []int32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glUniform.xhtml
 func UniformMatrix2fv(dst Uniform, src []float32) {
-	gl.UniformMatrix2fv(dst.Value, int32(len(src)/4), false, &src[0])
+	gl.UniformMatrix2fv(dst.Value, int32(len(src)/(2*2)), false, &src[0])
 }
 
 // UniformMatrix3fv writes 3x3 matrices. Each matrix uses nine
@@ -1157,7 +1163,6 @@ func VertexAttrib3fv(dst Attrib, src []float32) {
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glVertexAttrib.xhtml
 func VertexAttrib4f(dst Attrib, x, y, z, w float32) {
 	gl.VertexAttrib4f(uint32(dst.Value), x, y, z, w)
-
 }
 
 // VertexAttrib4fv writes a vec4 vertex attribute.
