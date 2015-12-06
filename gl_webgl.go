@@ -6,9 +6,11 @@
 
 package gl
 
-// TODO: Complete implementation of all remaining functions, search for `panic("*: not yet implemented")`.
-
-import "github.com/gopherjs/gopherjs/js"
+import (
+	"encoding/binary"
+	"github.com/gopherjs/gopherjs/js"
+	"math"
+)
 
 var ContextWatcher contextWatcher
 
@@ -114,11 +116,11 @@ func CompileShader(s Shader) {
 }
 
 func CompressedTexImage2D(target Enum, level int, internalformat Enum, width, height, border int, data []byte) {
-	panic("CompressedTexImage2D: not yet implemented")
+	c.Call("compressedTexImage2D", target, level, internalformat, width, height, border, data)
 }
 
 func CompressedTexSubImage2D(target Enum, level, xoffset, yoffset, width, height int, format Enum, data []byte) {
-	panic("CompressedTexSubImage2D: not yet implemented")
+	c.Call("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, data)
 }
 
 func CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, height, border int) {
@@ -276,15 +278,30 @@ func GetAttribLocation(p Program, name string) Attrib {
 }
 
 func GetBooleanv(dst []bool, pname Enum) {
-	panic("GetBooleanv: not yet implemented")
+	println("GetBooleanv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getParameter", pname)
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = result.Index(i).Bool()
+	}
 }
 
 func GetFloatv(dst []float32, pname Enum) {
-	panic("GetFloatv: not yet implemented")
+	println("GetFloatv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getParameter", pname)
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = float32(result.Index(i).Float())
+	}
 }
 
 func GetIntegerv(pname Enum, data []int32) {
-	panic("GetIntegerv: not yet implemented")
+	println("GetIntegerv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getParameter", pname)
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		data[i] = int32(result.Index(i).Int())
+	}
 }
 
 func GetInteger(pname Enum) int {
@@ -292,7 +309,7 @@ func GetInteger(pname Enum) int {
 }
 
 func GetBufferParameteri(target, pname Enum) int {
-	panic("GetBufferParameteri: not yet implemented")
+	return c.Call("getBufferParameter", target, pname).Int()
 }
 
 func GetError() Enum {
@@ -339,8 +356,13 @@ func GetShaderInfoLog(s Shader) string {
 	return c.Call("getShaderInfoLog", s.Object).String()
 }
 
-func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeLow, rangeHigh, precision int) {
-	panic("GetShaderPrecisionFormat: not yet implemented")
+func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeMin, rangeMax, precision int) {
+	println("GetShaderPrecisionFormat: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	format := c.Call("getShaderPrecisionFormat", shadertype, precisiontype)
+	rangeMin = format.Get("rangeMin").Int()
+	rangeMax = format.Get("rangeMax").Int()
+	precision = format.Get("precision").Int()
+	return
 }
 
 func GetShaderSource(s Shader) string {
@@ -352,19 +374,29 @@ func GetString(pname Enum) string {
 }
 
 func GetTexParameterfv(dst []float32, target, pname Enum) {
-	panic("GetTexParameterfv: not yet implemented")
+	dst[0] = float32(c.Call("getTexParameter", pname).Float())
 }
 
 func GetTexParameteriv(dst []int32, target, pname Enum) {
-	panic("GetTexParameteriv: not yet implemented")
+	dst[0] = int32(c.Call("getTexParameter", pname).Int())
 }
 
 func GetUniformfv(dst []float32, src Uniform, p Program) {
-	panic("GetUniformfv: not yet implemented")
+	println("GetUniformfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getUniform")
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = float32(result.Index(i).Float())
+	}
 }
 
 func GetUniformiv(dst []int32, src Uniform, p Program) {
-	panic("GetUniformiv: not yet implemented")
+	println("GetUniformiv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getUniform")
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = int32(result.Index(i).Int())
+	}
 }
 
 func GetUniformLocation(p Program, name string) Uniform {
@@ -372,23 +404,33 @@ func GetUniformLocation(p Program, name string) Uniform {
 }
 
 func GetVertexAttribf(src Attrib, pname Enum) float32 {
-	panic("GetVertexAttribf: not yet implemented")
+	return float32(c.Call("getVertexAttrib", src.Value, pname).Float())
 }
 
 func GetVertexAttribfv(dst []float32, src Attrib, pname Enum) {
-	panic("GetVertexAttribfv: not yet implemented")
+	println("GetVertexAttribfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getVertexAttrib")
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = float32(result.Index(i).Float())
+	}
 }
 
 func GetVertexAttribi(src Attrib, pname Enum) int32 {
-	panic("GetVertexAttribi: not yet implemented")
+	return int32(c.Call("getVertexAttrib", src.Value, pname).Int())
 }
 
 func GetVertexAttribiv(dst []int32, src Attrib, pname Enum) {
-	panic("GetVertexAttribiv: not yet implemented")
+	println("GetVertexAttribiv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	result := c.Call("getVertexAttrib")
+	length := result.Length()
+	for i := 0; i < length; i++ {
+		dst[i] = int32(result.Index(i).Int())
+	}
 }
 
 func Hint(target, mode Enum) {
-	panic("Hint: not yet implemented")
+	c.Call("hint", target, mode)
 }
 
 func IsBuffer(b Buffer) bool {
@@ -404,7 +446,7 @@ func IsFramebuffer(fb Framebuffer) bool {
 }
 
 func IsProgram(p Program) bool {
-	panic("IsProgram: not yet implemented")
+	return c.Call("isProgram", p.Object).Bool()
 }
 
 func IsRenderbuffer(rb Renderbuffer) bool {
@@ -432,19 +474,28 @@ func PixelStorei(pname Enum, param int32) {
 }
 
 func PolygonOffset(factor, units float32) {
-	panic("PolygonOffset: not yet implemented")
+	c.Call("polygonOffset", factor, units)
 }
 
 func ReadPixels(dst []byte, x, y, width, height int, format, ty Enum) {
-	panic("ReadPixels: not yet implemented")
+	println("ReadPixels: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	if ty == Enum(UNSIGNED_BYTE) {
+		c.Call("readPixels", x, y, width, height, format, ty, dst)
+	} else {
+		tmpDst := make([]float32, len(dst)/4)
+		c.Call("readPixels", x, y, width, height, format, ty, tmpDst)
+		for i, f := range tmpDst {
+			binary.LittleEndian.PutUint32(dst[i*4:], math.Float32bits(f))
+		}
+	}
 }
 
 func ReleaseShaderCompiler() {
-	panic("ReleaseShaderCompiler: not yet implemented")
+	// do nothing
 }
 
 func RenderbufferStorage(target, internalFormat Enum, width, height int) {
-	panic("RenderbufferStorage: not yet implemented")
+	c.Call("renderbufferStorage", target, internalFormat, width, height)
 }
 
 func SampleCoverage(value float32, invert bool) {
@@ -468,19 +519,19 @@ func StencilFuncSeparate(face, fn Enum, ref int, mask uint32) {
 }
 
 func StencilMask(mask uint32) {
-	panic("StencilMask: not yet implemented")
+	c.Call("stencilMask", mask)
 }
 
 func StencilMaskSeparate(face Enum, mask uint32) {
-	panic("StencilMaskSeparate: not yet implemented")
+	c.Call("stencilMaskSeparate", face, mask)
 }
 
 func StencilOp(fail, zfail, zpass Enum) {
-	panic("StencilOp: not yet implemented")
+	c.Call("stencilOp", fail, zfail, zpass)
 }
 
 func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
-	panic("StencilOpSeparate: not yet implemented")
+	c.Call("stencilOpSeparate", face, sfail, dpfail, dppass)
 }
 
 func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data []byte) {
@@ -488,15 +539,18 @@ func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum,
 }
 
 func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data []byte) {
-	panic("TexSubImage2D: not yet implemented")
+	c.Call("texSubImage2D", target, level, x, y, width, height, format, ty, data)
 }
 
 func TexParameterf(target, pname Enum, param float32) {
-	panic("TexParameterf: not yet implemented")
+	c.Call("texParameterf", target, pname, param)
 }
 
 func TexParameterfv(target, pname Enum, params []float32) {
-	panic("TexParameterfv: not yet implemented")
+	println("TexParameterfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	for _, param := range params {
+		c.Call("texParameterf", target, pname, param)
+	}
 }
 
 func TexParameteri(target, pname Enum, param int) {
@@ -504,7 +558,10 @@ func TexParameteri(target, pname Enum, param int) {
 }
 
 func TexParameteriv(target, pname Enum, params []int32) {
-	panic("TexParameteriv: not yet implemented")
+	println("TexParameteriv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
+	for _, param := range params {
+		c.Call("texParameteri", target, pname, param)
+	}
 }
 
 func Uniform1f(dst Uniform, v float32) {
@@ -592,35 +649,35 @@ func ValidateProgram(p Program) {
 }
 
 func VertexAttrib1f(dst Attrib, x float32) {
-	panic("VertexAttrib1f: not yet implemented")
+	c.Call("vertexAttrib1f", dst.Value, x)
 }
 
 func VertexAttrib1fv(dst Attrib, src []float32) {
-	panic("VertexAttrib1fv: not yet implemented")
+	c.Call("vertexAttrib1fv", dst.Value, src)
 }
 
 func VertexAttrib2f(dst Attrib, x, y float32) {
-	panic("VertexAttrib2f: not yet implemented")
+	c.Call("vertexAttrib2f", dst.Value, x, y)
 }
 
 func VertexAttrib2fv(dst Attrib, src []float32) {
-	panic("VertexAttrib2fv: not yet implemented")
+	c.Call("vertexAttrib2fv", dst.Value, src)
 }
 
 func VertexAttrib3f(dst Attrib, x, y, z float32) {
-	panic("VertexAttrib3f: not yet implemented")
+	c.Call("vertexAttrib3f", dst.Value, x, y, z)
 }
 
 func VertexAttrib3fv(dst Attrib, src []float32) {
-	panic("VertexAttrib3fv: not yet implemented")
+	c.Call("vertexAttrib3fv", dst.Value, src)
 }
 
 func VertexAttrib4f(dst Attrib, x, y, z, w float32) {
-	panic("VertexAttrib4f: not yet implemented")
+	c.Call("vertexAttrib4f", dst.Value, x, y, z, w)
 }
 
 func VertexAttrib4fv(dst Attrib, src []float32) {
-	panic("VertexAttrib4fv: not yet implemented")
+	c.Call("vertexAttrib4fv", dst.Value, src)
 }
 
 func VertexAttribPointer(dst Attrib, size int, ty Enum, normalized bool, stride, offset int) {
