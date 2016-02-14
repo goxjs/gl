@@ -8,8 +8,9 @@ package gl
 
 import (
 	"encoding/binary"
-	"github.com/gopherjs/gopherjs/js"
 	"math"
+
+	"github.com/gopherjs/gopherjs/js"
 )
 
 var ContextWatcher contextWatcher
@@ -535,7 +536,11 @@ func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
 }
 
 func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data []byte) {
-	c.Call("texImage2D", target, level, format, width, height, 0, format, ty, data)
+	var p interface{}
+	if data != nil {
+		p = data
+	}
+	c.Call("texImage2D", target, level, format, width, height, 0, format, ty, p)
 }
 
 func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data []byte) {
