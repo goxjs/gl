@@ -1,15 +1,23 @@
+sudo: false
+addons:
+  apt_packages:
+    - libgles2-mesa-dev
 language: go
 go:
-  - 1.4
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -qq libgles2-mesa-dev
+  - 1.5.3
+  - tip
+matrix:
+  allow_failures:
+    - go: tip
+  fast_finish: true
+install:
+  - # Do nothing. This is needed to prevent default install action "go get -t -v ./..." from happening here (we want it to happen inside script step).
+before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-install:
-  - go get golang.org/x/tools/cmd/vet
+  - sleep 3 # Give xvfb some time to start.
 script:
   - go get -t -v ./...
-  - diff -u <(echo -n) <(gofmt -d ./)
-  - go tool vet -composites=false -unsafeptr=false ./
+  - diff -u <(echo -n) <(gofmt -d -s .)
+  - go tool vet .
   - go test -v -race ./...
