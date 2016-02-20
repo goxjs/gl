@@ -857,8 +857,9 @@ func Scissor(x, y, width, height int32) {
 //
 // http://www.khronos.org/opengles/sdk/docs/man3/html/glShaderSource.xhtml
 func ShaderSource(s Shader, src string) {
-	glsource := gl.Str(src + "\x00")
-	gl.ShaderSource(s.Value, 1, &glsource, nil)
+	glsource, free := gl.Strs(src + "\x00")
+	gl.ShaderSource(s.Value, 1, glsource, nil)
+	free()
 }
 
 // StencilFunc sets the front and back stencil test reference value.
