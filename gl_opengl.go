@@ -555,6 +555,15 @@ func GetError() Enum {
 	return Enum(gl.GetError())
 }
 
+// GetBoundFramebuffer returns the currently bound framebuffer.
+// Use this method instead of gl.GetInteger(gl.FRAMEBUFFER_BINDING) to
+// enable support on all platforms
+func GetBoundFramebuffer() Framebuffer {
+	var b int32
+	gl.GetIntegerv(FRAMEBUFFER_BINDING, &b)
+	return Framebuffer{Value: uint32(b)}
+}
+
 // GetFramebufferAttachmentParameteri returns attachment parameters
 // for the active framebuffer object.
 //
