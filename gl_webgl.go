@@ -316,6 +316,10 @@ func GetError() Enum {
 	return Enum(c.Call("getError").Int())
 }
 
+func GetBoundFramebuffer() Framebuffer {
+	return Framebuffer{Object: c.Call("getParameter", FRAMEBUFFER_BINDING)}
+}
+
 func GetFramebufferAttachmentParameteri(target, attachment, pname Enum) int {
 	return c.Call("getFramebufferAttachmentParameter", target, attachment, pname).Int()
 }
