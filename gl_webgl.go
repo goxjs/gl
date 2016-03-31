@@ -297,7 +297,6 @@ func GetFloatv(dst []float32, pname Enum) {
 }
 
 func GetIntegerv(pname Enum, data []int32) {
-	println("GetIntegerv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	result := c.Call("getParameter", pname)
 	length := result.Length()
 	for i := 0; i < length; i++ {
