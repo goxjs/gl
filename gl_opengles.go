@@ -336,6 +336,12 @@ func GetError() Enum {
 	return Enum(C.glGetError())
 }
 
+func GetBoundFramebuffer() Framebuffer {
+	var b Framebuffer
+	C.glGetIntegerv(FRAMEBUFFER_BINDING, &b.Value)
+	return b
+}
+
 func GetFramebufferAttachmentParameteri(target, attachment, pname Enum) int {
 	var params C.GLint
 	C.glGetFramebufferAttachmentParameteriv(target.c(), attachment.c(), pname.c(), &params)
