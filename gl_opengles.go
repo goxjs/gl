@@ -339,7 +339,7 @@ func GetError() Enum {
 func GetBoundFramebuffer() Framebuffer {
 	println("GetBoundFramebuffer: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	var b C.GLint
-	C.glGetIntegerv((FRAMEBUFFER_BINDING, &b)
+	C.glGetIntegerv(FRAMEBUFFER_BINDING, &b)
 	return Framebuffer{Value: uint32(b)}
 }
 
