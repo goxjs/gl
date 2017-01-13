@@ -4,7 +4,7 @@
 
 // +build linux,!android
 
-package tests
+package test
 
 /*
 #cgo LDFLAGS: -lEGL

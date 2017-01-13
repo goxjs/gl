@@ -6,7 +6,7 @@
 
 // TODO(crawshaw): Run tests on other OSs when more contexts are supported.
 
-package tests
+package test
 
 import (
 	"encoding/binary"
