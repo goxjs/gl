@@ -4,7 +4,7 @@ Package gl is a Go cross-platform binding for OpenGL, with an OpenGL ES 2-like A
 
 It supports:
 
-- **OS X**, **Linux** and **Windows** via OpenGL 2.1 backend,
+- **macOS**, **Linux** and **Windows** via OpenGL 2.1 backend,
 
 - **iOS** and **Android** via OpenGL ES 2.0 backend,
 
