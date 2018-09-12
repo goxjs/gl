@@ -28,7 +28,7 @@ func (contextWatcher) OnDetach() {
 var c js.Value
 
 func ActiveTexture(texture Enum) {
-	c.Call("activeTexture", texture)
+	c.Call("activeTexture", int(texture))
 }
 
 func AttachShader(p Program, s Shader) {
@@ -535,9 +535,11 @@ func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
 func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data []byte) {
 	var p interface{}
 	if data != nil {
-		p = data
+		dataTA := js.TypedArrayOf(data)
+		defer dataTA.Release()
+		p = dataTA
 	}
-	c.Call("texImage2D", int(target), level, format, width, height, 0, format, int(ty), p)
+	c.Call("texImage2D", int(target), level, int(format), width, height, 0, int(format), int(ty), p)
 }
 
 func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data []byte) {
@@ -645,6 +647,10 @@ func UniformMatrix4fv(dst Uniform, src []float32) {
 }
 
 func UseProgram(p Program) {
+	// Workaround for js.Value zero value.
+	if p.Value == (js.Value{}) {
+		p.Value = js.Null()
+	}
 	c.Call("useProgram", p.Value)
 }
 
