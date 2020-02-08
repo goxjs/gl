@@ -8,8 +8,12 @@ package gl
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math"
+	"reflect"
+	"runtime"
 	"syscall/js"
+	"unsafe"
 )
 
 var ContextWatcher contextWatcher
@@ -22,6 +26,116 @@ func (contextWatcher) OnMakeCurrent(context interface{}) {
 }
 func (contextWatcher) OnDetach() {
 	c = js.Null()
+}
+
+func sliceToByteSlice(s interface{}) []byte {
+	switch s := s.(type) {
+	case []int8:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []int16:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 2
+		h.Cap *= 2
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []int32:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 4
+		h.Cap *= 4
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []int64:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 8
+		h.Cap *= 8
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []uint8:
+		return s
+	case []uint16:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 2
+		h.Cap *= 2
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []uint32:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 4
+		h.Cap *= 4
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []uint64:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 8
+		h.Cap *= 8
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []float32:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 4
+		h.Cap *= 4
+		return *(*[]byte)(unsafe.Pointer(h))
+	case []float64:
+		h := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+		h.Len *= 8
+		h.Cap *= 8
+		return *(*[]byte)(unsafe.Pointer(h))
+	default:
+		panic(fmt.Sprintf("jsutil: unexpected value at sliceToBytesSlice: %T", s))
+	}
+}
+
+func SliceToTypedArray(s interface{}) js.Value {
+	if s == nil {
+		return js.Null()
+	}
+
+	switch s := s.(type) {
+	case []int8:
+		a := js.Global().Get("Uint8Array").New(len(s))
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Int8Array").New(buf, a.Get("byteOffset"), a.Get("byteLength"))
+	case []int16:
+		a := js.Global().Get("Uint8Array").New(len(s) * 2)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Int16Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/2)
+	case []int32:
+		a := js.Global().Get("Uint8Array").New(len(s) * 4)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Int32Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/4)
+	case []uint8:
+		a := js.Global().Get("Uint8Array").New(len(s))
+		js.CopyBytesToJS(a, s)
+		runtime.KeepAlive(s)
+		return a
+	case []uint16:
+		a := js.Global().Get("Uint8Array").New(len(s) * 2)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Uint16Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/2)
+	case []uint32:
+		a := js.Global().Get("Uint8Array").New(len(s) * 4)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Uint32Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/4)
+	case []float32:
+		a := js.Global().Get("Uint8Array").New(len(s) * 4)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Float32Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/4)
+	case []float64:
+		a := js.Global().Get("Uint8Array").New(len(s) * 8)
+		js.CopyBytesToJS(a, sliceToByteSlice(s))
+		runtime.KeepAlive(s)
+		buf := a.Get("buffer")
+		return js.Global().Get("Float64Array").New(buf, a.Get("byteOffset"), a.Get("byteLength").Int()/8)
+	default:
+		panic(fmt.Sprintf("jsutil: unexpected value at SliceToTypedArray: %T", s))
+	}
 }
 
 // c is the current WebGL context, or nil if there is no current context.
@@ -75,18 +189,16 @@ func BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha Enum) 
 	c.Call("blendFuncSeparate", int(sfactorRGB), int(dfactorRGB), int(sfactorAlpha), int(dfactorAlpha))
 }
 
-func BufferData(target Enum, src []byte, usage Enum) {
-	srcTA := js.TypedArrayOf(src)
-	c.Call("bufferData", int(target), srcTA, int(usage))
-	srcTA.Release()
+func BufferData(target Enum, data interface{}, usage Enum) {
+	c.Call("bufferData", int(target), SliceToTypedArray(data), int(usage))
 }
 
 func BufferInit(target Enum, size int, usage Enum) {
 	c.Call("bufferData", int(target), size, int(usage))
 }
 
-func BufferSubData(target Enum, offset int, data []byte) {
-	c.Call("bufferSubData", int(target), offset, data)
+func BufferSubData(target Enum, offset int, data interface{}) {
+	c.Call("bufferSubData", int(target), offset, SliceToTypedArray(data))
 }
 
 func CheckFramebufferStatus(target Enum) Enum {
@@ -117,12 +229,12 @@ func CompileShader(s Shader) {
 	c.Call("compileShader", s.Value)
 }
 
-func CompressedTexImage2D(target Enum, level int, internalformat Enum, width, height, border int, data []byte) {
-	c.Call("compressedTexImage2D", int(target), level, internalformat, width, height, border, data)
+func CompressedTexImage2D(target Enum, level int, internalformat Enum, width, height, border int, data interface{}) {
+	c.Call("compressedTexImage2D", int(target), level, internalformat, width, height, border, SliceToTypedArray(data))
 }
 
-func CompressedTexSubImage2D(target Enum, level, xoffset, yoffset, width, height int, format Enum, data []byte) {
-	c.Call("compressedTexSubImage2D", int(target), level, xoffset, yoffset, width, height, format, data)
+func CompressedTexSubImage2D(target Enum, level, xoffset, yoffset, width, height int, format Enum, data interface{}) {
+	c.Call("compressedTexSubImage2D", int(target), level, xoffset, yoffset, width, height, format, SliceToTypedArray(data))
 }
 
 func CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, height, border int) {
@@ -532,18 +644,12 @@ func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
 	c.Call("stencilOpSeparate", face, sfail, dpfail, dppass)
 }
 
-func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data []byte) {
-	var p interface{}
-	if data != nil {
-		dataTA := js.TypedArrayOf(data)
-		defer dataTA.Release()
-		p = dataTA
-	}
-	c.Call("texImage2D", int(target), level, int(format), width, height, 0, int(format), int(ty), p)
+func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data interface{}) {
+	c.Call("texImage2D", int(target), level, int(format), width, height, 0, int(format), int(ty), SliceToTypedArray(data))
 }
 
-func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data []byte) {
-	c.Call("texSubImage2D", int(target), level, x, y, width, height, format, int(ty), data)
+func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data interface{}) {
+	c.Call("texSubImage2D", int(target), level, x, y, width, height, format, int(ty), SliceToTypedArray(data))
 }
 
 func TexParameterf(target, pname Enum, param float32) {
@@ -633,17 +739,15 @@ func Uniform4iv(dst Uniform, src []int32) {
 }
 
 func UniformMatrix2fv(dst Uniform, src []float32) {
-	c.Call("uniformMatrix2fv", dst.Value, false, src)
+	c.Call("uniformMatrix2fv", dst.Value, false, SliceToTypedArray(src))
 }
 
 func UniformMatrix3fv(dst Uniform, src []float32) {
-	c.Call("uniformMatrix3fv", dst.Value, false, src)
+	c.Call("uniformMatrix3fv", dst.Value, false, SliceToTypedArray(src))
 }
 
 func UniformMatrix4fv(dst Uniform, src []float32) {
-	srcTA := js.TypedArrayOf(src)
-	c.Call("uniformMatrix4fv", dst.Value, false, srcTA)
-	srcTA.Release()
+	c.Call("uniformMatrix4fv", dst.Value, false, SliceToTypedArray(src))
 }
 
 func UseProgram(p Program) {
