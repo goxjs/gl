@@ -42,11 +42,11 @@ type Uniform struct {
 	js.Value
 }
 
-func (v Attrib) Valid() bool       { return v.Value != 0 }
-func (v Program) Valid() bool      { return v.Value != js.Null() }
-func (v Shader) Valid() bool       { return v.Value != js.Null() }
-func (v Buffer) Valid() bool       { return v.Value != js.Null() }
-func (v Framebuffer) Valid() bool  { return v.Value != js.Null() }
-func (v Renderbuffer) Valid() bool { return v.Value != js.Null() }
-func (v Texture) Valid() bool      { return v.Value != js.Null() }
-func (v Uniform) Valid() bool      { return v.Value != js.Null() }
+var NoAttrib = Attrib{0}
+var NoProgram = Program{js.Null()}
+var NoShader = Shader{js.Null()}
+var NoBuffer = Buffer{js.Null()}
+var NoFramebuffer = Framebuffer{js.Null()}
+var NoRenderbuffer = Renderbuffer{js.Null()}
+var NoTexture = Texture{js.Null()}
+var NoUniform = Uniform{js.Null()}

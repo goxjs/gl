@@ -42,11 +42,11 @@ type Uniform struct {
 	*js.Object
 }
 
-func (v Attrib) Valid() bool       { return v.Value != 0 }
-func (v Program) Valid() bool      { return v.Object != nil }
-func (v Shader) Valid() bool       { return v.Object != nil }
-func (v Buffer) Valid() bool       { return v.Object != nil }
-func (v Framebuffer) Valid() bool  { return v.Object != nil }
-func (v Renderbuffer) Valid() bool { return v.Object != nil }
-func (v Texture) Valid() bool      { return v.Object != nil }
-func (v Uniform) Valid() bool      { return v.Object != nil }
+var NoAttrib = Attrib{0}
+var NoProgram = Program{nil}
+var NoShader = Shader{nil}
+var NoBuffer = Buffer{nil}
+var NoFramebuffer = Framebuffer{nil}
+var NoRenderbuffer = Renderbuffer{nil}
+var NoTexture = Texture{nil}
+var NoUniform = Uniform{nil}

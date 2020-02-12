@@ -46,11 +46,11 @@ type Uniform struct {
 	Value int32
 }
 
-func (v Attrib) Valid() bool       { return v.Value != 0 }
-func (v Program) Valid() bool      { return v.Value != 0 }
-func (v Shader) Valid() bool       { return v.Value != 0 }
-func (v Buffer) Valid() bool       { return v.Value != 0 }
-func (v Framebuffer) Valid() bool  { return v.Value != 0 }
-func (v Renderbuffer) Valid() bool { return v.Value != 0 }
-func (v Texture) Valid() bool      { return v.Value != 0 }
-func (v Uniform) Valid() bool      { return v.Value != 0 }
+var NoAttrib = Attrib{0}
+var NoProgram = Program{0}
+var NoShader = Shader{0}
+var NoBuffer = Buffer{0}
+var NoFramebuffer = Framebuffer{0}
+var NoRenderbuffer = Renderbuffer{0}
+var NoTexture = Texture{0}
+var NoUniform = Uniform{0}
