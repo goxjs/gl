@@ -76,8 +76,8 @@ func BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha Enum) 
 	c.Call("blendFuncSeparate", sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha)
 }
 
-func BufferData(target Enum, src []byte, usage Enum) {
-	c.Call("bufferData", target, src, usage)
+func BufferData(target Enum, data interface{}, usage Enum) {
+	c.Call("bufferData", target, data, usage)
 }
 
 func BufferInit(target Enum, size int, usage Enum) {
