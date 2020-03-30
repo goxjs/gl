@@ -752,7 +752,7 @@ func UniformMatrix4fv(dst Uniform, src []float32) {
 
 func UseProgram(p Program) {
 	// Workaround for js.Value zero value.
-	if p.Value == (js.Value{}) {
+	if p.Value.Equal(js.Value{}) {
 		p.Value = js.Null()
 	}
 	c.Call("useProgram", p.Value)
