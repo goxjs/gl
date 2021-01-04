@@ -11,6 +11,7 @@ package test
 // TODO(crawshaw): Support android and windows.
 
 /*
+#cgo CFLAGS: -DGL_SILENCE_DEPRECATION
 #cgo LDFLAGS: -framework OpenGL
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/gl3.h>
