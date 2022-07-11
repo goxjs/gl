@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package glutil implements OpenGL utility functions.
-package glutil // import "github.com/goxjs/gl/glutil"
+package glutil
 
 import (
 	"fmt"

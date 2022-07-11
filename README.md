@@ -1,4 +1,7 @@
-# gl [![Build Status](https://travis-ci.org/goxjs/gl.svg?branch=master)](https://travis-ci.org/goxjs/gl) [![GoDoc](https://godoc.org/github.com/goxjs/gl?status.svg)](https://godoc.org/github.com/goxjs/gl)
+gl
+==
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/goxjs/gl.svg)](https://pkg.go.dev/github.com/goxjs/gl)
 
 Package gl is a Go cross-platform binding for OpenGL, with an OpenGL ES 2-like API.
 
@@ -17,9 +20,8 @@ the new x/mobile/gl plan. It will exist and be fully supported until it can be s
 Installation
 ------------
 
-```bash
-go get -u github.com/goxjs/gl/...
-GOARCH=js go get -u -d github.com/goxjs/gl/...
+```sh
+go get github.com/goxjs/gl
 ```
 
 Usage
@@ -46,3 +48,16 @@ gl.ContextWatcher.OnMakeCurrent(nil)
 glfw.DetachCurrentContext()
 gl.ContextWatcher.OnDetach()
 ```
+
+Directories
+-----------
+
+| Path                                                    | Synopsis                                            |
+|---------------------------------------------------------|-----------------------------------------------------|
+| [glutil](https://pkg.go.dev/github.com/goxjs/gl/glutil) | Package glutil implements OpenGL utility functions. |
+| [test](https://pkg.go.dev/github.com/goxjs/gl/test)     | Package test contains tests for goxjs/gl.           |
+
+License
+-------
+
+-	[BSD-style License](LICENSE)
