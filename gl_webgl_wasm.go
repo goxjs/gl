@@ -1,16 +1,15 @@
-// Copyright 2014 The Go Authors.  All rights reserved.
+// Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build js,!wasm
+// +build js,wasm
 
 package gl
 
 import (
 	"encoding/binary"
 	"math"
-
-	"github.com/gopherjs/gopherjs/js"
+	"syscall/js"
 )
 
 var ContextWatcher contextWatcher
@@ -18,42 +17,42 @@ var ContextWatcher contextWatcher
 type contextWatcher struct{}
 
 func (contextWatcher) OnMakeCurrent(context interface{}) {
-	// context must be a WebGLRenderingContext *js.Object.
-	c = context.(*js.Object)
+	// context must be a WebGLRenderingContext js.Value.
+	c = context.(js.Value)
 }
 func (contextWatcher) OnDetach() {
-	c = nil
+	c = js.Null()
 }
 
 // c is the current WebGL context, or nil if there is no current context.
-var c *js.Object
+var c js.Value
 
 func ActiveTexture(texture Enum) {
-	c.Call("activeTexture", texture)
+	c.Call("activeTexture", int(texture))
 }
 
 func AttachShader(p Program, s Shader) {
-	c.Call("attachShader", p.Object, s.Object)
+	c.Call("attachShader", p.Value, s.Value)
 }
 
 func BindAttribLocation(p Program, a Attrib, name string) {
-	c.Call("bindAttribLocation", p.Object, a.Value, name)
+	c.Call("bindAttribLocation", p.Value, a.Value, name)
 }
 
 func BindBuffer(target Enum, b Buffer) {
-	c.Call("bindBuffer", target, b.Object)
+	c.Call("bindBuffer", int(target), b.Value)
 }
 
 func BindFramebuffer(target Enum, fb Framebuffer) {
-	c.Call("bindFramebuffer", target, fb.Object)
+	c.Call("bindFramebuffer", int(target), fb.Value)
 }
 
 func BindRenderbuffer(target Enum, rb Renderbuffer) {
-	c.Call("bindRenderbuffer", target, rb.Object)
+	c.Call("bindRenderbuffer", int(target), rb.Value)
 }
 
 func BindTexture(target Enum, t Texture) {
-	c.Call("bindTexture", target, t.Object)
+	c.Call("bindTexture", int(target), t.Value)
 }
 
 func BlendColor(red, green, blue, alpha float32) {
@@ -61,7 +60,7 @@ func BlendColor(red, green, blue, alpha float32) {
 }
 
 func BlendEquation(mode Enum) {
-	c.Call("blendEquation", mode)
+	c.Call("blendEquation", int(mode))
 }
 
 func BlendEquationSeparate(modeRGB, modeAlpha Enum) {
@@ -69,31 +68,33 @@ func BlendEquationSeparate(modeRGB, modeAlpha Enum) {
 }
 
 func BlendFunc(sfactor, dfactor Enum) {
-	c.Call("blendFunc", sfactor, dfactor)
+	c.Call("blendFunc", int(sfactor), int(dfactor))
 }
 
 func BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha Enum) {
-	c.Call("blendFuncSeparate", sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha)
+	c.Call("blendFuncSeparate", int(sfactorRGB), int(dfactorRGB), int(sfactorAlpha), int(dfactorAlpha))
 }
 
 func BufferData(target Enum, src []byte, usage Enum) {
-	c.Call("bufferData", target, src, usage)
+	srcTA := js.TypedArrayOf(src)
+	c.Call("bufferData", int(target), srcTA, int(usage))
+	srcTA.Release()
 }
 
 func BufferInit(target Enum, size int, usage Enum) {
-	c.Call("bufferData", target, size, usage)
+	c.Call("bufferData", int(target), size, int(usage))
 }
 
 func BufferSubData(target Enum, offset int, data []byte) {
-	c.Call("bufferSubData", target, offset, data)
+	c.Call("bufferSubData", int(target), offset, data)
 }
 
 func CheckFramebufferStatus(target Enum) Enum {
-	return Enum(c.Call("checkFramebufferStatus", target).Int())
+	return Enum(c.Call("checkFramebufferStatus", int(target)).Int())
 }
 
 func Clear(mask Enum) {
-	c.Call("clear", mask)
+	c.Call("clear", int(mask))
 }
 
 func ClearColor(red, green, blue, alpha float32) {
@@ -113,75 +114,75 @@ func ColorMask(red, green, blue, alpha bool) {
 }
 
 func CompileShader(s Shader) {
-	c.Call("compileShader", s.Object)
+	c.Call("compileShader", s.Value)
 }
 
 func CompressedTexImage2D(target Enum, level int, internalformat Enum, width, height, border int, data []byte) {
-	c.Call("compressedTexImage2D", target, level, internalformat, width, height, border, data)
+	c.Call("compressedTexImage2D", int(target), level, internalformat, width, height, border, data)
 }
 
 func CompressedTexSubImage2D(target Enum, level, xoffset, yoffset, width, height int, format Enum, data []byte) {
-	c.Call("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, data)
+	c.Call("compressedTexSubImage2D", int(target), level, xoffset, yoffset, width, height, format, data)
 }
 
 func CopyTexImage2D(target Enum, level int, internalformat Enum, x, y, width, height, border int) {
-	c.Call("copyTexImage2D", target, level, internalformat, x, y, width, height, border)
+	c.Call("copyTexImage2D", int(target), level, internalformat, x, y, width, height, border)
 }
 
 func CopyTexSubImage2D(target Enum, level, xoffset, yoffset, x, y, width, height int) {
-	c.Call("copyTexSubImage2D", target, level, xoffset, yoffset, x, y, width, height)
+	c.Call("copyTexSubImage2D", int(target), level, xoffset, yoffset, x, y, width, height)
 }
 
 func CreateBuffer() Buffer {
-	return Buffer{Object: c.Call("createBuffer")}
+	return Buffer{Value: c.Call("createBuffer")}
 }
 
 func CreateFramebuffer() Framebuffer {
-	return Framebuffer{Object: c.Call("createFramebuffer")}
+	return Framebuffer{Value: c.Call("createFramebuffer")}
 }
 
 func CreateProgram() Program {
-	return Program{Object: c.Call("createProgram")}
+	return Program{Value: c.Call("createProgram")}
 }
 
 func CreateRenderbuffer() Renderbuffer {
-	return Renderbuffer{Object: c.Call("createRenderbuffer")}
+	return Renderbuffer{Value: c.Call("createRenderbuffer")}
 }
 
 func CreateShader(ty Enum) Shader {
-	return Shader{Object: c.Call("createShader", ty)}
+	return Shader{Value: c.Call("createShader", int(ty))}
 }
 
 func CreateTexture() Texture {
-	return Texture{Object: c.Call("createTexture")}
+	return Texture{Value: c.Call("createTexture")}
 }
 
 func CullFace(mode Enum) {
-	c.Call("cullFace", mode)
+	c.Call("cullFace", int(mode))
 }
 
 func DeleteBuffer(v Buffer) {
-	c.Call("deleteBuffer", v.Object)
+	c.Call("deleteBuffer", v.Value)
 }
 
 func DeleteFramebuffer(v Framebuffer) {
-	c.Call("deleteFramebuffer", v.Object)
+	c.Call("deleteFramebuffer", v.Value)
 }
 
 func DeleteProgram(p Program) {
-	c.Call("deleteProgram", p.Object)
+	c.Call("deleteProgram", p.Value)
 }
 
 func DeleteRenderbuffer(v Renderbuffer) {
-	c.Call("deleteRenderbuffer", v.Object)
+	c.Call("deleteRenderbuffer", v.Value)
 }
 
 func DeleteShader(s Shader) {
-	c.Call("deleteShader", s.Object)
+	c.Call("deleteShader", s.Value)
 }
 
 func DeleteTexture(v Texture) {
-	c.Call("deleteTexture", v.Object)
+	c.Call("deleteTexture", v.Value)
 }
 
 func DepthFunc(fn Enum) {
@@ -197,11 +198,11 @@ func DepthRangef(n, f float32) {
 }
 
 func DetachShader(p Program, s Shader) {
-	c.Call("detachShader", p.Object, s.Object)
+	c.Call("detachShader", p.Value, s.Value)
 }
 
 func Disable(cap Enum) {
-	c.Call("disable", cap)
+	c.Call("disable", int(cap))
 }
 
 func DisableVertexAttribArray(a Attrib) {
@@ -209,15 +210,15 @@ func DisableVertexAttribArray(a Attrib) {
 }
 
 func DrawArrays(mode Enum, first, count int) {
-	c.Call("drawArrays", mode, first, count)
+	c.Call("drawArrays", int(mode), first, count)
 }
 
 func DrawElements(mode Enum, count int, ty Enum, offset int) {
-	c.Call("drawElements", mode, count, ty, offset)
+	c.Call("drawElements", int(mode), count, int(ty), offset)
 }
 
 func Enable(cap Enum) {
-	c.Call("enable", cap)
+	c.Call("enable", int(cap))
 }
 
 func EnableVertexAttribArray(a Attrib) {
@@ -233,54 +234,47 @@ func Flush() {
 }
 
 func FramebufferRenderbuffer(target, attachment, rbTarget Enum, rb Renderbuffer) {
-	c.Call("framebufferRenderbuffer", target, attachment, rbTarget, rb.Object)
+	c.Call("framebufferRenderbuffer", target, attachment, int(rbTarget), rb.Value)
 }
 
 func FramebufferTexture2D(target, attachment, texTarget Enum, t Texture, level int) {
-	c.Call("framebufferTexture2D", target, attachment, texTarget, t.Object, level)
+	c.Call("framebufferTexture2D", target, attachment, int(texTarget), t.Value, level)
 }
 
 func FrontFace(mode Enum) {
-	c.Call("frontFace", mode)
+	c.Call("frontFace", int(mode))
 }
 
 func GenerateMipmap(target Enum) {
-	c.Call("generateMipmap", target)
-}
-
-type activeInfo struct {
-	*js.Object
-	Size int    `js:"size"`
-	Type int    `js:"type"`
-	Name string `js:"name"`
+	c.Call("generateMipmap", int(target))
 }
 
 func GetActiveAttrib(p Program, index uint32) (name string, size int, ty Enum) {
-	ai := activeInfo{Object: c.Call("getActiveAttrib", p.Object, index)}
-	return ai.Name, ai.Size, Enum(ai.Type)
+	ai := c.Call("getActiveAttrib", p.Value, index)
+	return ai.Get("name").String(), ai.Get("size").Int(), Enum(ai.Get("type").Int())
 }
 
 func GetActiveUniform(p Program, index uint32) (name string, size int, ty Enum) {
-	ai := activeInfo{Object: c.Call("getActiveUniform", p.Object, index)}
-	return ai.Name, ai.Size, Enum(ai.Type)
+	ai := c.Call("getActiveUniform", p.Value, index)
+	return ai.Get("name").String(), ai.Get("size").Int(), Enum(ai.Get("type").Int())
 }
 
 func GetAttachedShaders(p Program) []Shader {
-	objs := c.Call("getAttachedShaders", p.Object)
+	objs := c.Call("getAttachedShaders", p.Value)
 	shaders := make([]Shader, objs.Length())
 	for i := 0; i < objs.Length(); i++ {
-		shaders[i] = Shader{Object: objs.Index(i)}
+		shaders[i] = Shader{Value: objs.Index(i)}
 	}
 	return shaders
 }
 
 func GetAttribLocation(p Program, name string) Attrib {
-	return Attrib{Value: c.Call("getAttribLocation", p.Object, name).Int()}
+	return Attrib{Value: c.Call("getAttribLocation", p.Value, name).Int()}
 }
 
 func GetBooleanv(dst []bool, pname Enum) {
 	println("GetBooleanv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
-	result := c.Call("getParameter", pname)
+	result := c.Call("getParameter", int(pname))
 	length := result.Length()
 	for i := 0; i < length; i++ {
 		dst[i] = result.Index(i).Bool()
@@ -289,7 +283,7 @@ func GetBooleanv(dst []bool, pname Enum) {
 
 func GetFloatv(dst []float32, pname Enum) {
 	println("GetFloatv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
-	result := c.Call("getParameter", pname)
+	result := c.Call("getParameter", int(pname))
 	length := result.Length()
 	for i := 0; i < length; i++ {
 		dst[i] = float32(result.Index(i).Float())
@@ -297,7 +291,7 @@ func GetFloatv(dst []float32, pname Enum) {
 }
 
 func GetIntegerv(pname Enum, data []int32) {
-	result := c.Call("getParameter", pname)
+	result := c.Call("getParameter", int(pname))
 	length := result.Length()
 	for i := 0; i < length; i++ {
 		data[i] = int32(result.Index(i).Int())
@@ -305,11 +299,11 @@ func GetIntegerv(pname Enum, data []int32) {
 }
 
 func GetInteger(pname Enum) int {
-	return c.Call("getParameter", pname).Int()
+	return c.Call("getParameter", int(pname)).Int()
 }
 
 func GetBufferParameteri(target, pname Enum) int {
-	return c.Call("getBufferParameter", target, pname).Int()
+	return c.Call("getBufferParameter", int(target), int(pname)).Int()
 }
 
 func GetError() Enum {
@@ -317,47 +311,47 @@ func GetError() Enum {
 }
 
 func GetBoundFramebuffer() Framebuffer {
-	return Framebuffer{Object: c.Call("getParameter", FRAMEBUFFER_BINDING)}
+	return Framebuffer{Value: c.Call("getParameter", FRAMEBUFFER_BINDING)}
 }
 
 func GetFramebufferAttachmentParameteri(target, attachment, pname Enum) int {
-	return c.Call("getFramebufferAttachmentParameter", target, attachment, pname).Int()
+	return c.Call("getFramebufferAttachmentParameter", int(target), int(attachment), int(pname)).Int()
 }
 
 func GetProgrami(p Program, pname Enum) int {
 	switch pname {
 	case DELETE_STATUS, LINK_STATUS, VALIDATE_STATUS:
-		if c.Call("getProgramParameter", p.Object, pname).Bool() {
+		if c.Call("getProgramParameter", p.Value, int(pname)).Bool() {
 			return TRUE
 		}
 		return FALSE
 	default:
-		return c.Call("getProgramParameter", p.Object, pname).Int()
+		return c.Call("getProgramParameter", p.Value, int(pname)).Int()
 	}
 }
 
 func GetProgramInfoLog(p Program) string {
-	return c.Call("getProgramInfoLog", p.Object).String()
+	return c.Call("getProgramInfoLog", p.Value).String()
 }
 
 func GetRenderbufferParameteri(target, pname Enum) int {
-	return c.Call("getRenderbufferParameter", target, pname).Int()
+	return c.Call("getRenderbufferParameter", int(target), int(pname)).Int()
 }
 
 func GetShaderi(s Shader, pname Enum) int {
 	switch pname {
 	case DELETE_STATUS, COMPILE_STATUS:
-		if c.Call("getShaderParameter", s.Object, pname).Bool() {
+		if c.Call("getShaderParameter", s.Value, int(pname)).Bool() {
 			return TRUE
 		}
 		return FALSE
 	default:
-		return c.Call("getShaderParameter", s.Object, pname).Int()
+		return c.Call("getShaderParameter", s.Value, int(pname)).Int()
 	}
 }
 
 func GetShaderInfoLog(s Shader) string {
-	return c.Call("getShaderInfoLog", s.Object).String()
+	return c.Call("getShaderInfoLog", s.Value).String()
 }
 
 func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeMin, rangeMax, precision int) {
@@ -370,19 +364,19 @@ func GetShaderPrecisionFormat(shadertype, precisiontype Enum) (rangeMin, rangeMa
 }
 
 func GetShaderSource(s Shader) string {
-	return c.Call("getShaderSource", s.Object).String()
+	return c.Call("getShaderSource", s.Value).String()
 }
 
 func GetString(pname Enum) string {
-	return c.Call("getParameter", pname).String()
+	return c.Call("getParameter", int(pname)).String()
 }
 
 func GetTexParameterfv(dst []float32, target, pname Enum) {
-	dst[0] = float32(c.Call("getTexParameter", pname).Float())
+	dst[0] = float32(c.Call("getTexParameter", int(pname)).Float())
 }
 
 func GetTexParameteriv(dst []int32, target, pname Enum) {
-	dst[0] = int32(c.Call("getTexParameter", pname).Int())
+	dst[0] = int32(c.Call("getTexParameter", int(pname)).Int())
 }
 
 func GetUniformfv(dst []float32, src Uniform, p Program) {
@@ -404,11 +398,11 @@ func GetUniformiv(dst []int32, src Uniform, p Program) {
 }
 
 func GetUniformLocation(p Program, name string) Uniform {
-	return Uniform{Object: c.Call("getUniformLocation", p.Object, name)}
+	return Uniform{Value: c.Call("getUniformLocation", p.Value, name)}
 }
 
 func GetVertexAttribf(src Attrib, pname Enum) float32 {
-	return float32(c.Call("getVertexAttrib", src.Value, pname).Float())
+	return float32(c.Call("getVertexAttrib", src.Value, int(pname)).Float())
 }
 
 func GetVertexAttribfv(dst []float32, src Attrib, pname Enum) {
@@ -421,7 +415,7 @@ func GetVertexAttribfv(dst []float32, src Attrib, pname Enum) {
 }
 
 func GetVertexAttribi(src Attrib, pname Enum) int32 {
-	return int32(c.Call("getVertexAttrib", src.Value, pname).Int())
+	return int32(c.Call("getVertexAttrib", src.Value, int(pname)).Int())
 }
 
 func GetVertexAttribiv(dst []int32, src Attrib, pname Enum) {
@@ -434,35 +428,35 @@ func GetVertexAttribiv(dst []int32, src Attrib, pname Enum) {
 }
 
 func Hint(target, mode Enum) {
-	c.Call("hint", target, mode)
+	c.Call("hint", int(target), int(mode))
 }
 
 func IsBuffer(b Buffer) bool {
-	return c.Call("isBuffer", b.Object).Bool()
+	return c.Call("isBuffer", b.Value).Bool()
 }
 
 func IsEnabled(cap Enum) bool {
-	return c.Call("isEnabled", cap).Bool()
+	return c.Call("isEnabled", int(cap)).Bool()
 }
 
 func IsFramebuffer(fb Framebuffer) bool {
-	return c.Call("isFramebuffer", fb.Object).Bool()
+	return c.Call("isFramebuffer", fb.Value).Bool()
 }
 
 func IsProgram(p Program) bool {
-	return c.Call("isProgram", p.Object).Bool()
+	return c.Call("isProgram", p.Value).Bool()
 }
 
 func IsRenderbuffer(rb Renderbuffer) bool {
-	return c.Call("isRenderbuffer", rb.Object).Bool()
+	return c.Call("isRenderbuffer", rb.Value).Bool()
 }
 
 func IsShader(s Shader) bool {
-	return c.Call("isShader", s.Object).Bool()
+	return c.Call("isShader", s.Value).Bool()
 }
 
 func IsTexture(t Texture) bool {
-	return c.Call("isTexture", t.Object).Bool()
+	return c.Call("isTexture", t.Value).Bool()
 }
 
 func LineWidth(width float32) {
@@ -470,11 +464,11 @@ func LineWidth(width float32) {
 }
 
 func LinkProgram(p Program) {
-	c.Call("linkProgram", p.Object)
+	c.Call("linkProgram", p.Value)
 }
 
 func PixelStorei(pname Enum, param int32) {
-	c.Call("pixelStorei", pname, param)
+	c.Call("pixelStorei", int(pname), param)
 }
 
 func PolygonOffset(factor, units float32) {
@@ -484,10 +478,10 @@ func PolygonOffset(factor, units float32) {
 func ReadPixels(dst []byte, x, y, width, height int, format, ty Enum) {
 	println("ReadPixels: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	if ty == Enum(UNSIGNED_BYTE) {
-		c.Call("readPixels", x, y, width, height, format, ty, dst)
+		c.Call("readPixels", x, y, width, height, format, int(ty), dst)
 	} else {
 		tmpDst := make([]float32, len(dst)/4)
-		c.Call("readPixels", x, y, width, height, format, ty, tmpDst)
+		c.Call("readPixels", x, y, width, height, format, int(ty), tmpDst)
 		for i, f := range tmpDst {
 			binary.LittleEndian.PutUint32(dst[i*4:], math.Float32bits(f))
 		}
@@ -511,7 +505,7 @@ func Scissor(x, y, width, height int32) {
 }
 
 func ShaderSource(s Shader, src string) {
-	c.Call("shaderSource", s.Object, src)
+	c.Call("shaderSource", s.Value, src)
 }
 
 func StencilFunc(fn Enum, ref int, mask uint32) {
@@ -541,119 +535,127 @@ func StencilOpSeparate(face, sfail, dpfail, dppass Enum) {
 func TexImage2D(target Enum, level int, width, height int, format Enum, ty Enum, data []byte) {
 	var p interface{}
 	if data != nil {
-		p = data
+		dataTA := js.TypedArrayOf(data)
+		defer dataTA.Release()
+		p = dataTA
 	}
-	c.Call("texImage2D", target, level, format, width, height, 0, format, ty, p)
+	c.Call("texImage2D", int(target), level, int(format), width, height, 0, int(format), int(ty), p)
 }
 
 func TexSubImage2D(target Enum, level int, x, y, width, height int, format, ty Enum, data []byte) {
-	c.Call("texSubImage2D", target, level, x, y, width, height, format, ty, data)
+	c.Call("texSubImage2D", int(target), level, x, y, width, height, format, int(ty), data)
 }
 
 func TexParameterf(target, pname Enum, param float32) {
-	c.Call("texParameterf", target, pname, param)
+	c.Call("texParameterf", int(target), int(pname), param)
 }
 
 func TexParameterfv(target, pname Enum, params []float32) {
 	println("TexParameterfv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	for _, param := range params {
-		c.Call("texParameterf", target, pname, param)
+		c.Call("texParameterf", int(target), int(pname), param)
 	}
 }
 
 func TexParameteri(target, pname Enum, param int) {
-	c.Call("texParameteri", target, pname, param)
+	c.Call("texParameteri", int(target), int(pname), param)
 }
 
 func TexParameteriv(target, pname Enum, params []int32) {
 	println("TexParameteriv: not yet tested (TODO: remove this after it's confirmed to work. Your feedback is welcome.)")
 	for _, param := range params {
-		c.Call("texParameteri", target, pname, param)
+		c.Call("texParameteri", int(target), int(pname), param)
 	}
 }
 
 func Uniform1f(dst Uniform, v float32) {
-	c.Call("uniform1f", dst.Object, v)
+	c.Call("uniform1f", dst.Value, v)
 }
 
 func Uniform1fv(dst Uniform, src []float32) {
-	c.Call("uniform1fv", dst.Object, src)
+	c.Call("uniform1fv", dst.Value, src)
 }
 
 func Uniform1i(dst Uniform, v int) {
-	c.Call("uniform1i", dst.Object, v)
+	c.Call("uniform1i", dst.Value, v)
 }
 
 func Uniform1iv(dst Uniform, src []int32) {
-	c.Call("uniform1iv", dst.Object, src)
+	c.Call("uniform1iv", dst.Value, src)
 }
 
 func Uniform2f(dst Uniform, v0, v1 float32) {
-	c.Call("uniform2f", dst.Object, v0, v1)
+	c.Call("uniform2f", dst.Value, v0, v1)
 }
 
 func Uniform2fv(dst Uniform, src []float32) {
-	c.Call("uniform2fv", dst.Object, src)
+	c.Call("uniform2fv", dst.Value, src)
 }
 
 func Uniform2i(dst Uniform, v0, v1 int) {
-	c.Call("uniform2i", dst.Object, v0, v1)
+	c.Call("uniform2i", dst.Value, v0, v1)
 }
 
 func Uniform2iv(dst Uniform, src []int32) {
-	c.Call("uniform2iv", dst.Object, src)
+	c.Call("uniform2iv", dst.Value, src)
 }
 
 func Uniform3f(dst Uniform, v0, v1, v2 float32) {
-	c.Call("uniform3f", dst.Object, v0, v1, v2)
+	c.Call("uniform3f", dst.Value, v0, v1, v2)
 }
 
 func Uniform3fv(dst Uniform, src []float32) {
-	c.Call("uniform3fv", dst.Object, src)
+	c.Call("uniform3fv", dst.Value, src)
 }
 
 func Uniform3i(dst Uniform, v0, v1, v2 int32) {
-	c.Call("uniform3i", dst.Object, v0, v1, v2)
+	c.Call("uniform3i", dst.Value, v0, v1, v2)
 }
 
 func Uniform3iv(dst Uniform, src []int32) {
-	c.Call("uniform3iv", dst.Object, src)
+	c.Call("uniform3iv", dst.Value, src)
 }
 
 func Uniform4f(dst Uniform, v0, v1, v2, v3 float32) {
-	c.Call("uniform4f", dst.Object, v0, v1, v2, v3)
+	c.Call("uniform4f", dst.Value, v0, v1, v2, v3)
 }
 
 func Uniform4fv(dst Uniform, src []float32) {
-	c.Call("uniform4fv", dst.Object, src)
+	c.Call("uniform4fv", dst.Value, src)
 }
 
 func Uniform4i(dst Uniform, v0, v1, v2, v3 int32) {
-	c.Call("uniform4i", dst.Object, v0, v1, v2, v3)
+	c.Call("uniform4i", dst.Value, v0, v1, v2, v3)
 }
 
 func Uniform4iv(dst Uniform, src []int32) {
-	c.Call("uniform4iv", dst.Object, src)
+	c.Call("uniform4iv", dst.Value, src)
 }
 
 func UniformMatrix2fv(dst Uniform, src []float32) {
-	c.Call("uniformMatrix2fv", dst.Object, false, src)
+	c.Call("uniformMatrix2fv", dst.Value, false, src)
 }
 
 func UniformMatrix3fv(dst Uniform, src []float32) {
-	c.Call("uniformMatrix3fv", dst.Object, false, src)
+	c.Call("uniformMatrix3fv", dst.Value, false, src)
 }
 
 func UniformMatrix4fv(dst Uniform, src []float32) {
-	c.Call("uniformMatrix4fv", dst.Object, false, src)
+	srcTA := js.TypedArrayOf(src)
+	c.Call("uniformMatrix4fv", dst.Value, false, srcTA)
+	srcTA.Release()
 }
 
 func UseProgram(p Program) {
-	c.Call("useProgram", p.Object)
+	// Workaround for js.Value zero value.
+	if p.Value == (js.Value{}) {
+		p.Value = js.Null()
+	}
+	c.Call("useProgram", p.Value)
 }
 
 func ValidateProgram(p Program) {
-	c.Call("validateProgram", p.Object)
+	c.Call("validateProgram", p.Value)
 }
 
 func VertexAttrib1f(dst Attrib, x float32) {
@@ -689,7 +691,7 @@ func VertexAttrib4fv(dst Attrib, src []float32) {
 }
 
 func VertexAttribPointer(dst Attrib, size int, ty Enum, normalized bool, stride, offset int) {
-	c.Call("vertexAttribPointer", dst.Value, size, ty, normalized, stride, offset)
+	c.Call("vertexAttribPointer", dst.Value, size, int(ty), normalized, stride, offset)
 }
 
 func Viewport(x, y, width, height int) {
